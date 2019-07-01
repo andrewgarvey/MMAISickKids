@@ -8,3 +8,10 @@ Title: Data_Functions
 
 Purpose: To provide accessible re-usable functions for Main files relating to Data
 """
+
+# read xlsx
+
+import pandas as pd
+
+def (read_excel):
+    pd.read_excel()
