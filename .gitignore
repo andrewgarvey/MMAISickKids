@@ -3,4 +3,4 @@
 *.xlsx
 *.xls
 
-
+# Important, never rely on this, keep data away from this repo!!
