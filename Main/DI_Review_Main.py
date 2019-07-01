@@ -24,10 +24,11 @@ import pandas as pd
 
 # import custom functions
 os.chdir(custom_func_path)
-
+import Data_Functions
 
 # Import DI data
 os.chdir(data_path)
+
 
 
 # Reset to output path
