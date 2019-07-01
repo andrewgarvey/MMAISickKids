@@ -1,19 +1,13 @@
 """
 Author: Andrew Garvey
-Client: SickKids
+Partner: Sargon Morad
+Date: July 1st, 2019
+Client: Hospital for Sick Children
 
-DI_Review Main File:
+Title: DI_Review_Main
 
--Imports Packages
--Imports all other functions required from other files
-    Exploration key results
-    Data Cleaning
-    Data Modeling
-
--Imports target Data
-    explores/cleans/models
-
-Outputs
+Purpose:
+-   Look for any trends in DI data that might be useful as it relates to staffing on a long term basis
+-   Prepare visualizations for a 1 time presentation
 """
 
-DI review
