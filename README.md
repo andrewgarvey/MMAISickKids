@@ -1,8 +1,7 @@
 # MMAI Capstone Project for Sick Kids Hospital 
 
 Author: Andrew Garvey     
-Partner : Sargon Morad
-
+Partner: Sargon Morad
 
 ### Desired outcomes of this project
 
