@@ -9,9 +9,6 @@ Title: Data_Functions
 Purpose: To provide accessible re-usable functions for Main files relating to Data
 """
 
-# read xlsx
-
 import pandas as pd
+import numpy as np
 
-def (read_excel):
-    pd.read_excel()

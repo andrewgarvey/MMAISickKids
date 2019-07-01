@@ -11,11 +11,15 @@ Purpose:
 -   Prepare visualizations for a 1 time presentation
 """
 
+# Import Packages
 import os
 import numpy as np
 import pandas as pd
 
-print('test')
 
-print('hi')
+# Import Custom Functions
+
+# Directory
+path = '/home/andrew/Public/DI'
+os.chdir(path)
 
