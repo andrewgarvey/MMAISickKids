@@ -11,3 +11,12 @@ Purpose:
 -   Prepare visualizations for a 1 time presentation
 """
 
+import os
+import numpy as np
+import pandas as pd
+
+print('test')
+
+print('hi')
+
+#asdf
