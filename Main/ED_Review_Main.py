@@ -19,7 +19,7 @@ import pandas as pd
 from Data_Functions import test_func
 
 # Import ED Data
-# ED_data = ???, are these guys prejoined?
+# ED_data = ???
 
 # All results will go to output path
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/ED_Review_Output/')
