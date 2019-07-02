@@ -42,10 +42,5 @@ DI_2019_Q2.shape  # looks like 22 k rows ish, 21 columns
 
 # As far as DI goes, seems pretty good to me
 
-# Add test comment
-
-# Do some other things
-
-# test 4
-
-#a
+# ---------------------------
+#andrew 123
