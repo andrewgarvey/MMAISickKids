@@ -18,6 +18,9 @@ import pandas as pd
 # Import Custom Functions
 from Data_Functions import test_func
 
+# Import Custom Files
+import Data_Functions
+
 # Import DI Data
 DI_2018_Q3 = pd.read_excel('/home/andrew/Public/DI/ED DI 2018 - Q3.xlsx')  # only 1 sheet
 DI_2018_Q4 = pd.read_excel('/home/andrew/Public/DI/ED DI 2018 - Q4.xlsx')
