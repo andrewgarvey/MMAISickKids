@@ -1,6 +1,9 @@
+# IMPORTANT!! never rely on this, keep data away from this repo!!
+
 # Excel files
 *.csv
 *.xlsx
 *.xls
 
-# Important, never rely on this, keep data away from this repo!!
+# pycache
+/__pycache__/
