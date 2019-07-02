@@ -48,3 +48,5 @@ DI_2019_Q2.shape  # looks like 22 k rows ish, 21 columns
 
 # test 4
 
+
+
