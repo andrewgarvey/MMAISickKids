@@ -6,4 +6,4 @@
 *.xls
 
 # pycache
-/__pycache__/
+*.pyc
