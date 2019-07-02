@@ -11,7 +11,6 @@ Purpose:
 -   Prepare visualizations for a 1 time presentation
 """
 # Set paths
-# custom_func_path = '/home/andrew/PycharmProjects/SickKidsMMAI/MMAISickKids/Helper_Functions/'
 data_path = '/home/andrew/Public/DI'
 output_path = '/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/DI_Review_Output/'
 
@@ -20,18 +19,19 @@ import os
 import numpy as np
 import pandas as pd
 
-# import custom functions
-os.chdir(custom_func_path)
+# Import Custom Functions
+from Data_Functions import test_func
+from Visualization_Functions import test
 
-import DataFunctions
-
-# Import DI data
+# Import DI Data
 os.chdir(data_path)
 
-# Reset to output path
+
+# All results go to output path
 os.chdir(output_path)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Data Exploration
+
 
 os.getcwd()

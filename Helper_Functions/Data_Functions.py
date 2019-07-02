@@ -12,8 +12,6 @@ Purpose: To provide accessible re-usable functions for Main files relating to Da
 import pandas as pd
 import numpy as np
 
-
-
 def test_func(var):
     print(var)
     return(var)

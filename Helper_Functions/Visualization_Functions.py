@@ -8,3 +8,6 @@ Title: Visualization_Functions
 
 Purpose: Purpose: To provide accessible re-usable functions for Main files relating to Visualizations
 """
+
+def test(a):
+    return(a)
