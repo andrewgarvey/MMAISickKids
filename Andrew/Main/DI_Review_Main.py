@@ -33,15 +33,14 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/DI_Review_
 # ----------------------------------------------------------------------------------------------------------------------
 # Data Exploration
 
-# Just check that not everything is horribly wrong
-
+# basic explorations
 DI_2018_Q3.describe()
 DI_2018_Q3.columns.values
 
-DI_2018_Q3.shape
-DI_2018_Q4.shape
-DI_2019_Q1.shape
-DI_2019_Q2.shape  # looks like 22 k rows ish, 21 columns
+print(DI_2018_Q3.shape)
+print(DI_2018_Q4.shape)
+print(DI_2019_Q1.shape)
+print(DI_2019_Q2.shape) # looks like 22 k rows ish, 21 columns
 
 # As far as DI goes, seems pretty good to me
 
