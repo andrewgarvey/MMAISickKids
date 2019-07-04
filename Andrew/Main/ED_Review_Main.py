@@ -18,8 +18,17 @@ import pandas as pd
 # Import Custom Functions
 from Data_Functions import test_func
 
+# Import Custom Files
+import Data_Functions
+
 # Import ED Data
-# ED_data = ???
+
+ED_2018_Aug_2019_Feb = pd.read_csv('/home/dsingh/Public/ED_Epic_Data/ED_DATA_EPIC_AUG18_TO_FEB19.csv', encoding = 'latin-1')
+ED_2019_Feb = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/Feb13_ClinData_2019.xlsx') # only 1 sheet
+ED_2019_Mar = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/March_ClinData_2019.xlsx')
+ED_2019_Apr = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/April_ClinData_2019.xlsx')
+ED_2019_May = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/May_ClinData_2019.xlsx')
+ED_2019_Jun = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/June_ClinData_2019.xlsx')
 
 # All results will go to output path
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/ED_Review_Output/')
@@ -28,5 +37,3 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/ED_Review_
 # Data Exploration
 
 # Just check that not everything is horribly wrong,
-
-# um should have seperate triage based data somewhere?
