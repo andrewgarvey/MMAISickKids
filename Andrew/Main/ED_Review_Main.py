@@ -36,10 +36,13 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/ED_Review_
 # ----------------------------------------------------------------------------------------------------------------------
 # Data Exploration
 
-# are the files the same shape?
-ED_2018_Aug_2019_Feb.shape # (48803, 52)
+# are the files the same columns?
+ED_2018_Aug_2019_Feb.shape  # (48803, 52)
+ED_2019_Feb.shape  # (3312, 50)
+ED_2019_Mar.shape  # (6779, 50)
 
-ED_2019_Feb.shape
+# were off by a few, csv has 2 extra columns
+
 
 
 # ----------------------------------------------------------------------------------------------------------------------
