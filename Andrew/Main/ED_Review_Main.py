@@ -23,7 +23,8 @@ import Data_Functions
 
 # Import ED Data
 
-ED_2018_Aug_2019_Feb = pd.read_csv('/home/dsingh/Public/ED_Epic_Data/ED_DATA_EPIC_AUG18_TO_FEB19.csv', encoding ='latin-1') # i believe this is a property of linux being different
+ED_2018_Aug_2019_Feb = pd.read_csv('/home/dsingh/Public/ED_Epic_Data/ED_DATA_EPIC_AUG18_TO_FEB19.csv'
+                                   , encoding ='latin-1') # i believe this is a property of linux being different
 ED_2019_Feb = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/Feb13_ClinData_2019.xlsx')  # only 1 sheet
 ED_2019_Mar = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/March_ClinData_2019.xlsx')
 ED_2019_Apr = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/April_ClinData_2019.xlsx')
@@ -64,24 +65,27 @@ del lst
 # ----------------------------------------------------------------------------------------------------------------------
 # Data Exploration Cleaning
 
+# CSN dups
+dup_index = ED_Full.duplicated(subset='CSN', keep=False)
+ED_Full = ED_Full.loc[~dup_index]
+
 # Columns
 ED_Full.columns
 
-# Encounter Number, pick only multi MRN, sort by mrn, consider making custom if this is wrong
+# Remove entirely useless columns
 
+
+# Encounter Number, pick only multi MRN, sort by mrn,
 multi_mrn_index = ED_Full.duplicated(subset='MRN', keep=False)
 
 multi_mrn = ED_Full.loc[multi_mrn_index]
 multi_mrn = multi_mrn.sort_values(by = ['MRN'])
+multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]  # conclusion, make our own, visits since Aug 2018
 
-multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]
+# generate a roomed datetime
+
+# generate an arrived datetime
+
+# use that roomed datetime to generate a "since Aug 2018 date" ie Visits in last year
 
 
-
-
-#rowwise
-
-dup_index = ED_Full.duplicated(subset='CSN', keep=False)
-ED_Full = ED_Full.loc[!dup_index]
-
-# Columns to be removed
