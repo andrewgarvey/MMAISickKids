@@ -34,9 +34,9 @@ ED_2019_Jun = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/June_ClinData_201
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/ED_Review_Output/')
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Data Exploration
+# Data Merging
 
-# are the files the same columns?
+# Are the files the same columns?
 ED_2018_Aug_2019_Feb.shape  # (48803, 52)
 ED_2019_Feb.shape  # (3312, 50)
 ED_2019_Mar.shape  # (6779, 50)
@@ -48,15 +48,40 @@ ED_2018_Aug_2019_Feb = ED_2018_Aug_2019_Feb.drop(['X','Unnamed: 0'], axis=1)
 ED_2018_Aug_2019_Feb.columns = ED_2019_Feb.columns
 
 # merge everything together
-
 ED_Full = ED_2018_Aug_2019_Feb.append([ED_2019_Feb,ED_2019_Mar,ED_2019_Apr,ED_2019_May,ED_2019_Jun],ignore_index=True)
 
+ED_Full.shape
+
 # check for dupes, incase the timeframe overlapped, check for duplicated MRN
-
 sum(ED_Full.duplicated(subset=None, keep='first')) # 0, no dupes across whole row
-sum(ED_Full.duplicated(subset='MRN', keep='first'))
-sum(ED_Full.duplicated(subset='CSN', keep='first')) # MRN vs CRN
+sum(ED_Full.duplicated(subset='MRN', keep='first')) # 212000 are duplicated Patients
+sum(ED_Full.duplicated(subset='CSN', keep=False)) # 174 duplicated Visits, gonna remove entirely small enough
 
-
+# cleaning
+lst =  ED_2018_Aug_2019_Feb, ED_2019_Apr, ED_2019_Feb, ED_2019_Mar, ED_2019_May, ED_2019_Jun
+del ED_2018_Aug_2019_Feb, ED_2019_Apr, ED_2019_Feb, ED_2019_Mar, ED_2019_May, ED_2019_Jun
+del lst
 # ----------------------------------------------------------------------------------------------------------------------
+# Data Exploration Cleaning
 
+# Columns
+ED_Full.columns
+
+# Encounter Number, pick only multi MRN, sort by mrn, consider making custom if this is wrong
+
+multi_mrn_index = ED_Full.duplicated(subset='MRN', keep=False)
+
+multi_mrn = ED_Full.loc[multi_mrn_index]
+multi_mrn = multi_mrn.sort_values(by = ['MRN'])
+
+multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]
+
+
+
+
+#rowwise
+
+dup_index = ED_Full.duplicated(subset='CSN', keep=False)
+ED_Full = ED_Full.loc[!dup_index]
+
+# Columns to be removed
