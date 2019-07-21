@@ -71,8 +71,23 @@ ED_Full = ED_Full.loc[~dup_index]
 
 # Columns
 ED_Full.columns
+ED_Full.isna().sum()
+
+ED_Full['Door to PIA'].value_counts()
 
 # Remove entirely useless columns
+ED_Reduced = ED_Full.drop(['Encounter Number','Registration Number','Pref Language','Acuity','Care Area','ED Complaint',
+                           'Diagnosis','First ED Provider','Last ED Provider','ED Longest Attending ED Provider',
+                           'Treatment Team','Last Attending Provider','Discharge-Admit Time','Door to PIA',
+                           'ED PIA Threshold', 'ED Completed Length of Stay (Hours)','LOS','ED LWBS','Arrival to Room',
+                           'Door to Pain Med','Hour of Arrival','Triage Complete User',
+                           'Arrival to Initial Nursing Assessment','Door to Doc','CC.1','Primary Dx','Diagnoses',
+                           'Admitting Provider','Lab Status','Rad Status'],axis = 1)
+
+
+# Counts
+ED_Reduced.columns
+ED_Reduced.isna().sum()
 
 
 # Encounter Number, pick only multi MRN, sort by mrn,
@@ -84,8 +99,14 @@ multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]  # conclusion, 
 
 # generate a roomed datetime
 
-# generate an arrived datetime
+# generate an arrived datetime, also bucketed
 
-# use that roomed datetime to generate a "since Aug 2018 date" ie Visits in last year
+# generate a discharge dateime
+
+# generate time between roomed > arrived > discharge
+
+# use that arrived datetime to generate a "since Aug 2018 date" ie Visits in last year
+
+# use that to generate visits in last 6mo/ 3mo/ 1mo
 
 
