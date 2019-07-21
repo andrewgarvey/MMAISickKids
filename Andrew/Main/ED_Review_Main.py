@@ -124,8 +124,7 @@ multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]  # conclusion, 
 # Weight has to have the (!) removed
 
 # ----------------------------------------------------------------------------------------------------------------------
-
-# We can have an overall, but for statistics that are appropriate everything should be grouped by gender and age buckets
+# We can have a overall, but for statistics that are appropriate everything should be grouped by gender and age buckets
 
 # Probably most
 ED_Reduced['Last Weight'].unique()
