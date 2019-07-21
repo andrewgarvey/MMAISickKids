@@ -75,7 +75,7 @@ ED_Full.isna().sum()
 
 ED_Full['Door to PIA'].value_counts()
 
-# Remove entirely useless columns
+# Remove entirely useless columns, recall purpose is to 'predict demand as function of month/day' and 'predict DI'
 ED_Reduced = ED_Full.drop(['Encounter Number','Registration Number','Pref Language','Acuity','Care Area','ED Complaint',
                            'Diagnosis','First ED Provider','Last ED Provider','ED Longest Attending ED Provider',
                            'Treatment Team','Last Attending Provider','Discharge-Admit Time','Door to PIA',
@@ -97,16 +97,37 @@ multi_mrn = ED_Full.loc[multi_mrn_index]
 multi_mrn = multi_mrn.sort_values(by = ['MRN'])
 multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]  # conclusion, make our own, visits since Aug 2018
 
-# generate a roomed datetime
+# format roomed datetime
 
-# generate an arrived datetime, also bucketed
+# format arrived datetime
 
-# generate a discharge dateime
+# format discharge datetime
 
-# generate time between roomed > arrived > discharge
+# generate time between arrived > roomed > discharge
 
 # use that arrived datetime to generate a "since Aug 2018 date" ie Visits in last year
 
 # use that to generate visits in last 6mo/ 3mo/ 1mo
 
+# Address - > change to postal code and province
 
+# Age needs to incorporate month vs wk vs year old,
+
+# Weight has a few "none"
+
+# CTA made more clear as a number
+
+# Current Medications, List the number?
+
+# BP has many many NA...
+
+# Weight has to have the (!) removed
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# We can have an overall, but for statistics that are appropriate everything should be grouped by gender and age buckets
+
+# Probably most
+ED_Reduced['Last Weight'].unique()
+
+ED_Reduced.groupby('Dispo').count()
