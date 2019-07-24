@@ -59,8 +59,16 @@ sum(DI_Full.duplicated(subset=('MRN'),keep='first'))  # yes plenty of patient wi
 sum(DI_Full.duplicated(subset=('MRN','Order Time','Procedure'),keep='first'))
 # can have some with same order time, cannot have same procedure at same time
 
+# Remove columns that
+
 # Format date acceptably
 DI_Full['Order Time'] = pd.to_datetime(DI_Full['Order Time'])
 
-# Check in on the amount of people that actually match between the two
+# Check in on the amount of people that actually match between the two, same MRN
+All_Full = DI_Full.merge(ED_Full, how='inner', on = 'MRN' )
+All_Full.shape #plenty because MRN is not unique in either table
+All_Full.dtypes
+
+
+# Join based on MRN and OrderTime is LESS THAN 24 hours AFTER Arrived Time
 
