@@ -21,7 +21,7 @@ del name
 import os
 import numpy as np
 import pandas as pd
-from datetime import datetime,timedelta
+import datetime as dt
 
 # Import Custom Functions
 from Data_Functions import test_func
@@ -71,8 +71,10 @@ All_Full.dtypes
 
 
 # Restrict the Joined to be based on Order time < 24 hours AFTER Arrived
-Time_Difference = All_full['Order Time']
-Logical_Time_Index = Time_Difference < 24
+Time_Difference = (All_Full['Order Time'] - All_Full['Arrived']).astype('timedelta64[s]')
+Logical_Time_Index = Time_Difference < (24*60*60)
 
 All_Restricted = All_Full[Logical_Time_Index]
 
+
+All_Restricted.shape
