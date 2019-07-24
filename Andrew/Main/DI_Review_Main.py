@@ -72,7 +72,9 @@ All_Full.dtypes
 
 # Restrict the Joined to be based on Order time < 24 hours AFTER Arrived
 Time_Difference = (All_Full['Order Time'] - All_Full['Arrived']).astype('timedelta64[s]')
-Logical_Time_Index = Time_Difference < (24*60*60)
+Check1 = Time_Difference < (24*60*60)
+Check2 = Time_Difference > 0
+Logical_Time_Index = Check1&Check2
 
 All_Restricted = All_Full[Logical_Time_Index]
 
