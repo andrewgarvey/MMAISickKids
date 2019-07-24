@@ -130,3 +130,4 @@ multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]  # conclusion, 
 ED_Reduced['Last Weight'].unique()
 
 ED_Reduced.groupby('Dispo').count()
+
