@@ -10,6 +10,11 @@ Purpose:
 -   Look for any trends in ED data that might be useful as it relates to staffing on a long term basis
 -   Prepare visualizations for a 1 time presentation
 """
+# clear user created variables
+for name in dir():
+    if not name.startswith('_'):
+        del globals()[name]
+
 # Import Packages
 import os
 import numpy as np
@@ -99,7 +104,7 @@ multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]  # conclusion, 
 
 # format roomed datetime
 
-# format arrived datetime
+# format arrived datetime !!!
 
 # format discharge datetime
 

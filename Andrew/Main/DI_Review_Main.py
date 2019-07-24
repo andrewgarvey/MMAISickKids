@@ -10,6 +10,11 @@ Purpose:
 -   Look for any trends in DI data that might be useful as it relates to staffing on a long term basis
 -   Prepare visualizations for a 1 time presentation
 """
+# clear user created variables
+for name in dir():
+    if not name.startswith('_'):
+        del globals()[name]
+
 # Import Packages
 import os
 import numpy as np
@@ -46,3 +51,13 @@ print(DI_2019_Q2.shape) # looks like 22 k rows ish, 21 columns
 
 # ---------------------------
 # words
+
+# Merge into 1 dataset
+
+# Format the
+
+my_dir = dir()
+
+for name in dir():
+    if not name.startswith('_'):
+        del globals()[name]
