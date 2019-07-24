@@ -15,10 +15,13 @@ for name in dir():
     if not name.startswith('_'):
         del globals()[name]
 
+del name
+
 # Import Packages
 import os
 import numpy as np
 import pandas as pd
+from datetime import datetime
 
 # Import Custom Functions
 from Data_Functions import test_func
@@ -38,26 +41,26 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/DI_Review_
 # ----------------------------------------------------------------------------------------------------------------------
 # Data Exploration
 
-# basic explorations
-DI_2018_Q3.describe()
-DI_2018_Q3.columns.values
-
-print(DI_2018_Q3.shape)
-print(DI_2018_Q4.shape)
-print(DI_2019_Q1.shape)
-print(DI_2019_Q2.shape) # looks like 22 k rows ish, 21 columns
-
-# As far as DI goes, seems pretty good to me
-
-# ---------------------------
-# words
-
 # Merge into 1 dataset
+DI_Full = DI_2018_Q3.append([DI_2018_Q4,DI_2019_Q1,DI_2019_Q2],ignore_index=True)
 
-# Format the
+# basic explorations
+DI_Full.describe()
+DI_Full.isna().sum()
+DI_Full.shape
+DI_Full.dtypes
 
-my_dir = dir()
+# check for full row dupes
+DI_dup_index = DI_Full.duplicated(keep='first')
+sum(DI_dup_index) # no entire row dupes
 
-for name in dir():
-    if not name.startswith('_'):
-        del globals()[name]
+sum(DI_Full.duplicated(subset=('Order ID'),keep='first'))  # no duped orders
+sum(DI_Full.duplicated(subset=('MRN'),keep='first'))  # yes plenty of patient with multiple tests
+sum(DI_Full.duplicated(subset=('MRN','Order Time','Procedure'),keep='first'))
+# can have some with same order time, cannot have same procedure at same time
+
+# Format date acceptably
+DI_Full['Order Time'] = pd.to_datetime(DI_Full['Order Time'])
+
+# Check in on the amount of people that actually match between the two
+

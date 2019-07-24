@@ -15,10 +15,13 @@ for name in dir():
     if not name.startswith('_'):
         del globals()[name]
 
+del name
+
 # Import Packages
 import os
 import numpy as np
 import pandas as pd
+from datetime import datetime
 
 # Import Custom Functions
 from Data_Functions import test_func
@@ -71,8 +74,8 @@ del lst
 # Data Exploration Cleaning
 
 # CSN dups
-dup_index = ED_Full.duplicated(subset='CSN', keep=False)
-ED_Full = ED_Full.loc[~dup_index]
+ED_dup_index = ED_Full.duplicated(subset='CSN', keep=False)
+ED_Full = ED_Full.loc[~ED_dup_index]
 
 # Columns
 ED_Full.columns
@@ -102,9 +105,10 @@ multi_mrn = ED_Full.loc[multi_mrn_index]
 multi_mrn = multi_mrn.sort_values(by = ['MRN'])
 multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]  # conclusion, make our own, visits since Aug 2018
 
-# format roomed datetime
+# format arrived datetime
+ED_Reduced['Arrived'] = pd.to_datetime(ED_Reduced['Arrived'])
 
-# format arrived datetime !!!
+# format roomed datetime
 
 # format discharge datetime
 
