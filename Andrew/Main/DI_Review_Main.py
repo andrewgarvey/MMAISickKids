@@ -21,7 +21,7 @@ del name
 import os
 import numpy as np
 import pandas as pd
-from datetime import datetime
+from datetime import datetime,timedelta
 
 # Import Custom Functions
 from Data_Functions import test_func
@@ -65,10 +65,14 @@ sum(DI_Full.duplicated(subset=('MRN','Order Time','Procedure'),keep='first'))
 DI_Full['Order Time'] = pd.to_datetime(DI_Full['Order Time'])
 
 # Check in on the amount of people that actually match between the two, same MRN
-All_Full = DI_Full.merge(ED_Full, how='inner', on = 'MRN' )
-All_Full.shape #plenty because MRN is not unique in either table
+All_Full = DI_Full.merge(ED_Reduced, how='inner', on = 'MRN' )
+All_Full.shape #plenty because MRN is not distinct in either table
 All_Full.dtypes
 
 
-# Join based on MRN and OrderTime is LESS THAN 24 hours AFTER Arrived Time
+# Restrict the Joined to be based on Order time < 24 hours AFTER Arrived
+Time_Difference = All_full['Order Time']
+Logical_Time_Index = Time_Difference < 24
+
+All_Restricted = All_Full[Logical_Time_Index]
 
