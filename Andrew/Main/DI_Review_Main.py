@@ -78,5 +78,6 @@ Logical_Time_Index = Check1&Check2
 
 All_Restricted = All_Full[Logical_Time_Index]
 
+test =
 
 All_Restricted.shape
