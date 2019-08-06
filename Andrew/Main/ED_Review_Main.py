@@ -97,7 +97,6 @@ ED_Reduced = ED_Full.drop(['Encounter Number','Registration Number','Pref Langua
 ED_Reduced.columns
 ED_Reduced.isna().sum()
 
-
 # Encounter Number, pick only multi MRN, sort by mrn,
 multi_mrn_index = ED_Full.duplicated(subset='MRN', keep=False)
 
