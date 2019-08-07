@@ -32,7 +32,7 @@ import Data_Functions
 # Import ED Data
 
 ED_2018_Aug_2019_Feb = pd.read_csv('/home/dsingh/Public/ED_Epic_Data/ED_DATA_EPIC_AUG18_TO_FEB19.csv'
-                                   , encoding ='latin-1') # i believe this is a property of linux being different
+                                   , encoding ='latin-1') # unsure exactly whats wrong with this one
 ED_2019_Feb = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/Feb13_ClinData_2019.xlsx')  # only 1 sheet
 ED_2019_Mar = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/March_ClinData_2019.xlsx')
 ED_2019_Apr = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/April_ClinData_2019.xlsx')
@@ -73,7 +73,7 @@ del lst
 # ----------------------------------------------------------------------------------------------------------------------
 # Data Exploration Cleaning
 
-# CSN dups
+# CSN dups removed
 ED_dup_index = ED_Full.duplicated(subset='CSN', keep=False)
 ED_Full = ED_Full.loc[~ED_dup_index]
 
@@ -108,14 +108,17 @@ multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]  # conclusion, 
 ED_Reduced['Arrived'] = pd.to_datetime(ED_Reduced['Arrived'])
 
 # format roomed datetime
+ED_Reduced['Roomed'] = pd.to_datetime(ED_Reduced['Roomed'].astype(str), format='%d/%m %H%m')
 
-# format discharge datetime
+# format discharge datetime, replace empty spaces w nan first
+ED_Reduced.loc[ED_Reduced['Disch Date/Time']==' ','Disch Date/Time'] = np.nan
+ED_Reduced['Disch Date/Time'] = pd.to_datetime(ED_Reduced['Disch Date/Time'].astype(str), format=' %d/%m/%Y %H%M')
 
 # generate time between arrived > roomed > discharge
 
 # use that arrived datetime to generate a "since Aug 2018 date" ie Visits in last year
 
-# use that to generate visits in last 6mo/ 3mo/ 1mo
+# use that to generate # visits in last 6mo/ 3mo/ 1mo
 
 # Address - > change to postal code and province
 
