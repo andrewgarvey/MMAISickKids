@@ -96,6 +96,7 @@ ED_Reduced = ED_Full.drop(['Encounter Number','Registration Number','Pref Langua
 # Counts
 ED_Reduced.columns
 ED_Reduced.isna().sum()
+ED_Reduced.dtypes
 
 # Encounter Number, pick only multi MRN, sort by mrn,
 multi_mrn_index = ED_Full.duplicated(subset='MRN', keep=False)
@@ -107,12 +108,37 @@ multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]  # conclusion, 
 # format arrived datetime
 ED_Reduced['Arrived'] = pd.to_datetime(ED_Reduced['Arrived'])
 
-# format roomed datetime
-ED_Reduced['Roomed'] = pd.to_datetime(ED_Reduced['Roomed'].astype(str), format='%d/%m %H%m')
-
 # format discharge datetime, replace empty spaces w nan first
 ED_Reduced.loc[ED_Reduced['Disch Date/Time']==' ','Disch Date/Time'] = np.nan
 ED_Reduced['Disch Date/Time'] = pd.to_datetime(ED_Reduced['Disch Date/Time'].astype(str), format=' %d/%m/%Y %H%M')
+
+# format roomed datetime, this one is silly, no padded dates, no year...
+roomed_year = ED_Reduced['Arrived'].dt.year.astype(str) #double check dec 31 no issue...
+roomed_year = roomed_year.str.extract(pat = '(^[0-9]{4})')
+
+
+roomed_month = ED_Reduced['Roomed'].str.extract(pat = '(/[0-9]+)')
+roomed_month = roomed_month.iloc[:,0].str.replace('/','',regex=False)
+
+roomed_day = ED_Reduced['Roomed'].str.extract(pat = '([0-9]+/)')
+roomed_day = roomed_day.iloc[:,0].str.replace('/','',regex=False)
+
+roomed_time = ED_Reduced['Roomed'].str.extract(pat = '([0-9]{4})')
+
+roomed_hour = roomed_time.iloc[:,0].str.extract(pat = '(^[0-9]{2})')
+roomed_hour = roomed_hour.iloc[:,0]
+
+roomed_minute = roomed_time.iloc[:,0].str.extract(pat = '([0-9]{2}$)')
+roomed_minute = roomed_minute.iloc[:,0]
+
+# now we have a bunch of series to make into a datetime
+arrived_df = pd.DataFrame({'year': roomed_year,
+                           'month': roomed_month,
+                           'day': roomed_day,
+                           'hour': roomed_hour,
+                           'minute': roomed_minute})
+
+ED_Reduced['Roomed'] = pd.to_datetime(arrived_df[['year', 'month', 'day', 'hour', 'minute']])
 
 # generate time between arrived > roomed > discharge
 
