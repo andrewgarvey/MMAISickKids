@@ -106,7 +106,8 @@ multi_mrn = multi_mrn.sort_values(by = ['MRN'])
 multi_mrn = multi_mrn.loc[:,['MRN','Encounter Number','Roomed']]  # conclusion, make our own, visits since Aug 2018
 
 # format arrived datetime
-ED_Reduced['Arrived'] = pd.to_datetime(ED_Reduced['Arrived'])
+ED_Reduced.loc[ED_Reduced['Arrived']==' ','Arrived'] = np.nan
+ED_Reduced['Arrived'] = pd.to_datetime(ED_Reduced['Arrived'].astype(str), format=' %d/%m/%y %H%M')
 
 # format discharge datetime, replace empty spaces w nan first
 ED_Reduced.loc[ED_Reduced['Disch Date/Time']==' ','Disch Date/Time'] = np.nan
@@ -115,7 +116,7 @@ ED_Reduced['Disch Date/Time'] = pd.to_datetime(ED_Reduced['Disch Date/Time'].ast
 # format roomed datetime, this one is silly, no padded dates, no year...
 roomed_year = ED_Reduced['Arrived'].dt.year.astype(str) #double check dec 31 no issue...
 roomed_year = roomed_year.str.extract(pat = '(^[0-9]{4})')
-
+roomed_year = roomed_year.iloc[:,0]
 
 roomed_month = ED_Reduced['Roomed'].str.extract(pat = '(/[0-9]+)')
 roomed_month = roomed_month.iloc[:,0].str.replace('/','',regex=False)
@@ -140,9 +141,19 @@ arrived_df = pd.DataFrame({'year': roomed_year,
 
 ED_Reduced['Roomed'] = pd.to_datetime(arrived_df[['year', 'month', 'day', 'hour', 'minute']])
 
-# generate time between arrived > roomed > discharge
+# generate time between arrived/roomed/discharge in minutes
+
+ED_Reduced['Arrived to Roomed'] = ED_Reduced['Roomed']-ED_Reduced['Arrived']
+ED_Reduced['Arrived to Roomed'] = ED_Reduced['Arrived to Roomed']/np.timedelta64(1,'h')
+
+ED_Reduced['Roomed to Discharge'] = ED_Reduced['Disch Date/Time']-ED_Reduced['Roomed']
+ED_Reduced['Roomed to Discharge'] = ED_Reduced['Roomed to Discharge']/np.timedelta64(1,'h')
+
+ED_Reduced['Arrived to Discharge'] = ED_Reduced['Disch Date/Time']-ED_Reduced['Arrived']
+ED_Reduced['Arrived to Discharge'] = ED_Reduced['Arrived to Discharge']/np.timedelta64(1,'h')
 
 # use that arrived datetime to generate a "since Aug 2018 date" ie Visits in last year
+
 
 # use that to generate # visits in last 6mo/ 3mo/ 1mo
 
