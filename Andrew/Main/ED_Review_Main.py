@@ -84,7 +84,7 @@ ED_Full.isna().sum()
 ED_Full['Door to PIA'].value_counts()
 
 # Remove entirely useless columns, recall purpose is to 'predict demand as function of month/day' and 'predict DI'
-ED_Reduced = ED_Full.drop(['Encounter Number','Registration Number','Pref Language','Acuity','Care Area','ED Complaint',
+ED_Reduced = ED_Full.drop(['Registration Number','Pref Language','Acuity','Care Area','ED Complaint',
                            'Diagnosis','First ED Provider','Last ED Provider','ED Longest Attending ED Provider',
                            'Treatment Team','Last Attending Provider','Discharge-Admit Time','Door to PIA',
                            'ED PIA Threshold', 'ED Completed Length of Stay (Hours)','LOS','ED LWBS','Arrival to Room',
@@ -152,14 +152,19 @@ ED_Reduced['Roomed to Discharge'] = ED_Reduced['Roomed to Discharge']/np.timedel
 ED_Reduced['Arrived to Discharge'] = ED_Reduced['Disch Date/Time']-ED_Reduced['Arrived']
 ED_Reduced['Arrived to Discharge'] = ED_Reduced['Arrived to Discharge']/np.timedelta64(1,'h')
 
-# use that arrived datetime to generate a "since Aug 2018 date" ie Visits in last year
+# use that arrived datetime to generate a "since Aug 2018 date" ie Visits in last year, MRN is patient, CRN is visit
+ED_Reduced['Visits Since Aug 2018'] = ED_Reduced.groupby(by='MRN')['Roomed'].transform(lambda x: x.rank())
 
+# keep old number of visits to see if helpful (remove 2k)
+ED_Reduced['Encounter Number'] = ED_Reduced['Encounter Number']-2000
 
-# use that to generate # visits in last 6mo/ 3mo/ 1mo
+# Address - > change to postal code and province,
+ED_Reduced['Postal Code'] = ED_Reduced['Address'].str.extract(pat='([A-Z][0-9][A-Z] [0-9][A-Z][0-9]$)')
 
-# Address - > change to postal code and province
+ED_Reduced['Province'] = ED_Reduced['Address'].str.extract(pat='( [A-Z]{2} )')
 
 # Age needs to incorporate month vs wk vs year old,
+test = ED_Reduced
 
 # Weight has a few "none"
 
