@@ -163,8 +163,8 @@ ED_Reduced['Postal Code'] = ED_Reduced['Address'].str.extract(pat='([A-Z][0-9][A
 
 ED_Reduced['Province'] = ED_Reduced['Address'].str.extract(pat='( [A-Z]{2} )')
 
-# Age needs to incorporate month vs wk vs year old,
-test = ED_Reduced
+# Age needs to incorporate month vs wk vs year old, y.o. vs m.o. vs wk.o. vs days
+test = ED_Reduced['Age at Visit']
 
 # Weight has a few "none"
 
