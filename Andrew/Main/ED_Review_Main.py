@@ -81,8 +81,6 @@ ED_Full = ED_Full.loc[~ED_dup_index]
 ED_Full.columns
 ED_Full.isna().sum()
 
-ED_Full['Door to PIA'].value_counts()
-
 # Remove entirely useless columns, recall purpose is to 'predict demand as function of month/day' and 'predict DI'
 ED_Reduced = ED_Full.drop(['Registration Number','Pref Language','Acuity','Care Area','ED Complaint',
                            'Diagnosis','First ED Provider','Last ED Provider','ED Longest Attending ED Provider',
@@ -159,18 +157,23 @@ ED_Reduced['Visits Since Aug 2018'] = ED_Reduced.groupby(by='MRN')['Roomed'].tra
 ED_Reduced['Encounter Number'] = ED_Reduced['Encounter Number']-2000
 
 # Address - > change to postal code and province,
-ED_Reduced['Postal Code'] = ED_Reduced['Address'].str.extract(pat='([A-Z][0-9][A-Z] [0-9][A-Z][0-9]$)')
+ED_Reduced['Province_PostalCode'] = ED_Reduced['Address'].str.extract(pat='([A-Z]{2} [A-Z][0-9][A-Z] [0-9][A-Z][0-9]$)')
 
-ED_Reduced['Province'] = ED_Reduced['Address'].str.extract(pat='( [A-Z]{2} )')
+ED_Reduced['Postal Code'] = ED_Reduced['Province_PostalCode'].str.extract(pat='([A-Z][0-9][A-Z] [0-9][A-Z][0-9]$)')
+ED_Reduced['Province'] = ED_Reduced['Province_PostalCode'].str.extract(pat='(^[A-Z]{2})')
 
-# Age needs to incorporate month vs wk vs year old, y.o. vs m.o. vs wk.o. vs days
-test = ED_Reduced['Age at Visit']
+ED_Reduced = ED_Reduced.drop(['Address','Province_PostalCode'],axis = 1)
 
+# Age needs to to be in 1 unit (gonna choose days), y.o. vs m.o. vs wk.o. vs days
+ED_Reduced['Age at Visit Number'] = ED_Reduced['Age at Visit'].str.extract(pat='(^[0-9]+)')
+
+ED_Recued['Age at Visit type'] = ED_Reduced['Age at Visit'].str.extract(pat='[]')
 # Weight has a few "none"
 
-# CTA made more clear as a number
-
+df.groupby('domain')['ID'].nunique()git sta
 # Current Medications, List the number?
+
+#pulse and bp resp and temp, strip the text
 
 # BP has many many NA...
 
