@@ -203,7 +203,9 @@ ED_Reduced['Pulse Formatted'] = ED_Reduced['Pulse'].str.extract(pat='(^[0-9]+)')
 ED_Reduced['Resp Formatted'] = ED_Reduced['Resp'].str.extract(pat='(^[0-9]+)')
 ED_Reduced['Temp Formatted'] = ED_Reduced['Temp'].str.extract(pat='(^[0-9]+)')
 
-
+# Remove the columns that are no longer needed
+ED_Clean_w_null = ED_Reduced.drop(['Age at Visit','Last Weight','Current Medications','Pulse','Resp','Temp',
+                                   'Age at Visit Number','Age at Visit denomination'] , axis = 1)
 # ----------------------------------------------------------------------------------------------------------------------
 ## Basic Stats
 # We can have a overall, but for statistics that are appropriate everything should be grouped by gender and age buckets
