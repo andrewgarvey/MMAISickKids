@@ -170,8 +170,8 @@ ED_Reduced['Age at Visit Number'] = ED_Reduced['Age at Visit'].str.extract(pat='
 ED_Recued['Age at Visit type'] = ED_Reduced['Age at Visit'].str.extract(pat='[]')
 # Weight has a few "none"
 
-df.groupby('domain')['ID'].nunique()git sta
-# Current Medications, List the number?
+
+# Current Medications, list the number of them
 
 #pulse and bp resp and temp, strip the text
 
