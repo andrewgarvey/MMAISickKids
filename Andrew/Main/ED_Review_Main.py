@@ -198,10 +198,23 @@ ED_Reduced['Current Medications Number'] = ED_Reduced['Current Medications Numbe
 nan_index = ED_Reduced['Current Medications Number'].isnull()
 ED_Reduced['Current Medications Number'].loc[nan_index] = 0
 
-#pulse and resp and temp, use just number no text
-ED_Reduced['Pulse Formatted'] = ED_Reduced['Pulse'].str.extract(pat='(^[0-9]+)')
-ED_Reduced['Resp Formatted'] = ED_Reduced['Resp'].str.extract(pat='(^[0-9]+)')
-ED_Reduced['Temp Formatted'] = ED_Reduced['Temp'].str.extract(pat='(^[0-9]+)')
+#pulse and resp and temp, use just number no text, rounded
+ED_Reduced['Pulse'] = ED_Reduced['Pulse'].astype(str)
+ED_Reduced['Resp'] = ED_Reduced['Resp'].astype(str)
+ED_Reduced['Temp'] = ED_Reduced['Temp'].astype(str)
+
+ED_Reduced['Pulse Formatted'] = ED_Reduced['Pulse'].str.extract(pat='([0-9]*)')
+ED_Reduced['Resp Formatted'] = ED_Reduced['Resp'].str.extract(pat='([0-9]*)')
+ED_Reduced['Temp Formatted'] = ED_Reduced['Temp'].str.extract(pat='([0-9]*)') # rounded
+
+# Replace empty with nan
+empty_index_pulse = (ED_Reduced['Pulse Formatted'] == '')
+empty_index_resp = (ED_Reduced['Resp Formatted'] == '')
+empty_index_temp = (ED_Reduced['Temp Formatted'] == '')
+
+ED_Reduced['Pulse Formatted'].loc[empty_index_pulse] = np.nan
+ED_Reduced['Resp Formatted'].loc[empty_index_resp] = np.nan
+ED_Reduced['Temp Formatted'].loc[empty_index_temp] = np.nan
 
 # Remove the columns that are no longer needed
 ED_Clean_w_null = ED_Reduced.drop(['Age at Visit','Last Weight','Current Medications','Pulse','Resp','Temp',
@@ -210,12 +223,10 @@ ED_Clean_w_null = ED_Reduced.drop(['Age at Visit','Last Weight','Current Medicat
 ## Basic Stats
 # We can have a overall, but for statistics that are appropriate everything should be grouped by gender and age buckets
 
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 ## Making the last step towards a perfect ML usable Dataframe
 
-# Remove or replace all Nulls,
+# Remove or replace all Nulls, either impute or remove rows or remove columns
 ED_Reduced.isna().sum()
 
 # Check out formats and what not for proper data types, want integeters factors
