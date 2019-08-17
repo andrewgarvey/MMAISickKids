@@ -191,10 +191,12 @@ none_index = (ED_Reduced['Last Weight formatted']=='None')
 ED_Reduced['Last Weight formatted'].loc[none_index] = np.nan
 
 # Current Medications, list the number of them, nan = 0?
-nan_index = ED_Reduced['Current Medications'].isnull()
+ED_Reduced['Current Medications Number'] = ED_Reduced['Current Medications']
 
-ED_Reduced['Current Medications Formatted'] = ED_Reduced['Current Medications']
-ED_Reduced['Current Medications Formatted'].loc[nan_index] = 0
+ED_Reduced['Current Medications Number'] = ED_Reduced['Current Medications Number'].str.count(';') +1
+
+nan_index = ED_Reduced['Current Medications Number'].isnull()
+ED_Reduced['Current Medications Number'].loc[nan_index] = 0
 
 
 #pulse and resp and temp, use just number no text
