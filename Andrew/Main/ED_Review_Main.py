@@ -88,7 +88,7 @@ ED_Reduced = ED_Full.drop(['Registration Number','Pref Language','Acuity','Care 
                            'ED PIA Threshold', 'ED Completed Length of Stay (Hours)','LOS','ED LWBS','Arrival to Room',
                            'Door to Pain Med','Hour of Arrival','Triage Complete User',
                            'Arrival to Initial Nursing Assessment','Door to Doc','CC.1','Primary Dx','Diagnoses',
-                           'Admitting Provider','Lab Status','Rad Status'],axis = 1)
+                           'Admitting Provider','Lab Status','Rad Status','BP'],axis = 1)
 
 
 # Counts
@@ -184,16 +184,16 @@ ED_Reduced['Age at Visit Number'] = ED_Reduced['Age at Visit Number'].astype(flo
 
 ED_Reduced['Age at Visit in days'] = ED_Reduced['Age at Visit Number']*ED_Reduced['Age at Visit denomination']
 
-# multiply to get proper weight
+# Last weight has a few "none", strip the kg
+ED_Reduced['Last Weight'] = ED_Reduced['Last Weight'].str.replace('kg','',regex=False)
 
+None_index = (ED_Reduced['Last Weight']=='None'])
+ED_Reduced['Last Weight'].loc[None_index] = np.nan
 
-# Weight has a few "none"
 
 # Current Medications, list the number of them
 
-#pulse and bp resp and temp, strip the text
-
-# BP has many many NA...
+#pulse and resp and temp, strip the text
 
 # Weight has to have the (!) removed
 
