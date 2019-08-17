@@ -198,12 +198,11 @@ ED_Reduced['Current Medications Number'] = ED_Reduced['Current Medications Numbe
 nan_index = ED_Reduced['Current Medications Number'].isnull()
 ED_Reduced['Current Medications Number'].loc[nan_index] = 0
 
-
 #pulse and resp and temp, use just number no text
+ED_Reduced['Pulse Formatted'] = ED_Reduced['Pulse'].str.extract(pat='(^[0-9]+)')
+ED_Reduced['Resp Formatted'] = ED_Reduced['Resp'].str.extract(pat='(^[0-9]+)')
+ED_Reduced['Temp Formatted'] = ED_Reduced['Temp'].str.extract(pat='(^[0-9]+)')
 
-# Weight has to have the (!) removed
-
-# Have to have the things removed
 
 # ----------------------------------------------------------------------------------------------------------------------
 ## Basic Stats
