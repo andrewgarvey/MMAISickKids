@@ -165,11 +165,29 @@ ED_Reduced['Province'] = ED_Reduced['Province_PostalCode'].str.extract(pat='(^[A
 ED_Reduced = ED_Reduced.drop(['Address','Province_PostalCode'],axis = 1)
 
 # Age needs to to be in 1 unit (gonna choose days), y.o. vs m.o. vs wk.o. vs days
-ED_Reduced['Age at Visit Number'] = ED_Reduced['Age at Visit'].str.extract(pat='(^[0-9]+)')
+ED_Reduced['Age at Visit Number'] = ED_Reduced['Age at Visit'].str.extract(pat='( [0-9]+)')
+ED_Reduced['Age at Visit denomination'] = ED_Reduced['Age at Visit'].str.extract(pat='([A-z].+)')
 
-ED_Recued['Age at Visit type'] = ED_Reduced['Age at Visit'].str.extract(pat='[]')
+# convert string to proper time
+year_index = (ED_Reduced['Age at Visit denomination']=='y.o.')
+month_index = (ED_Reduced['Age at Visit denomination']=='m.o.')
+week_index = (ED_Reduced['Age at Visit denomination']=='wk.o.')
+days_index = (ED_Reduced['Age at Visit denomination']=='days')
+
+ED_Reduced['Age at Visit denomination'].loc[year_index] = 365
+ED_Reduced['Age at Visit denomination'].loc[month_index] = 30
+ED_Reduced['Age at Visit denomination'].loc[week_index] = 7
+ED_Reduced['Age at Visit denomination'].loc[days_index] = 1
+
+ED_Reduced['Age at Visit denomination'] = ED_Reduced['Age at Visit denomination'].astype(float)
+ED_Reduced['Age at Visit Number'] = ED_Reduced['Age at Visit Number'].astype(float)
+
+ED_Reduced['Age at Visit in days'] = ED_Reduced['Age at Visit Number']*ED_Reduced['Age at Visit denomination']
+
+# multiply to get proper weight
+
+
 # Weight has a few "none"
-
 
 # Current Medications, list the number of them
 
@@ -179,11 +197,23 @@ ED_Recued['Age at Visit type'] = ED_Reduced['Age at Visit'].str.extract(pat='[]'
 
 # Weight has to have the (!) removed
 
+# Have to have the things removed
+
 # ----------------------------------------------------------------------------------------------------------------------
+## Basic Stats
 # We can have a overall, but for statistics that are appropriate everything should be grouped by gender and age buckets
 
-# Probably most
-ED_Reduced['Last Weight'].unique()
 
-ED_Reduced.groupby('Dispo').count()
 
+# ----------------------------------------------------------------------------------------------------------------------
+## Making the last step towards a perfect ML usable Dataframe
+
+# Remove or replace all Nulls,
+ED_Reduced.isna().sum()
+
+# Check out formats and what not for proper data types, want integeters factors
+ED_Reduced.dtypes
+
+
+# Check in on unique values of each column to make sure they are ok
+# do a dead simple LR on age just to confirm it doesnt break and is somewhat reasonable
