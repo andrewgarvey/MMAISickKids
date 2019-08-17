@@ -174,7 +174,7 @@ month_index = (ED_Reduced['Age at Visit denomination']=='m.o.')
 week_index = (ED_Reduced['Age at Visit denomination']=='wk.o.')
 days_index = (ED_Reduced['Age at Visit denomination']=='days')
 
-ED_Reduced['Age at Visit denomination'].loc[year_index] = 365
+ED_Reduced['Age at Visit denomination'].loc[year_index] = 365 # gives warning , still works fine
 ED_Reduced['Age at Visit denomination'].loc[month_index] = 30
 ED_Reduced['Age at Visit denomination'].loc[week_index] = 7
 ED_Reduced['Age at Visit denomination'].loc[days_index] = 1
@@ -185,11 +185,10 @@ ED_Reduced['Age at Visit Number'] = ED_Reduced['Age at Visit Number'].astype(flo
 ED_Reduced['Age at Visit in days'] = ED_Reduced['Age at Visit Number']*ED_Reduced['Age at Visit denomination']
 
 # Last weight has a few "none", strip the kg
-ED_Reduced['Last Weight'] = ED_Reduced['Last Weight'].str.replace('kg','',regex=False)
+ED_Reduced['Last Weight formatted'] = ED_Reduced['Last Weight'].str.replace('kg','',regex=False)
 
-None_index = (ED_Reduced['Last Weight']=='None'])
-ED_Reduced['Last Weight'].loc[None_index] = np.nan
-
+none_index = (ED_Reduced['Last Weight formatted']=='None')
+ED_Reduced['Last Weight formatted'].loc[none_index] = np.nan
 
 # Current Medications, list the number of them
 
