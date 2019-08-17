@@ -190,9 +190,14 @@ ED_Reduced['Last Weight formatted'] = ED_Reduced['Last Weight'].str.replace('kg'
 none_index = (ED_Reduced['Last Weight formatted']=='None')
 ED_Reduced['Last Weight formatted'].loc[none_index] = np.nan
 
-# Current Medications, list the number of them
+# Current Medications, list the number of them, nan = 0?
+nan_index = ED_Reduced['Current Medications'].isnull()
 
-#pulse and resp and temp, strip the text
+ED_Reduced['Current Medications Formatted'] = ED_Reduced['Current Medications']
+ED_Reduced['Current Medications Formatted'].loc[nan_index] = 0
+
+
+#pulse and resp and temp, use just number no text
 
 # Weight has to have the (!) removed
 
