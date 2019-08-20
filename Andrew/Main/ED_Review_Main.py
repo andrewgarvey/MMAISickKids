@@ -222,17 +222,18 @@ ED_Clean_w_null = ED_Reduced.drop(['Age at Visit','Last Weight','Current Medicat
 # ----------------------------------------------------------------------------------------------------------------------
 ## Basic Stats
 # We can have a overall, but for statistics that are appropriate everything should be grouped by gender and age buckets
-
+ED_Clean_w_null.describe().transpose()
 
 # ----------------------------------------------------------------------------------------------------------------------
 ## Making the last step towards a perfect ML usable Dataframe
 
 # Remove or replace all Nulls, either impute or remove rows or remove columns
-ED_Reduced.isna().sum()
+ED_Clean = ED_Clean_w_null.dropna()
 
-# Check out formats and what not for proper data types, want integeters factors
-ED_Reduced.dtypes
+ED_Clean_w_null.shape
+ED_Clean.shape # i consider this acceptable loses for a proof of concept
 
+# Check out formats and what not for proper data types, want integers/factors
+ED_Clean.dtypes # looks fine
 
 # Check in on unique values of each column to make sure they are ok
-# do a dead simple LR on age just to confirm it doesnt break and is somewhat reasonable
