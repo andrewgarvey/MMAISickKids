@@ -69,7 +69,6 @@ All_Clean_Reduced = All_Clean_Reduced.drop(All_Clean_Reduced.columns[di_mrn], ax
 All_Clean_Reduced.dtypes
 All_Clean_Reduced['Arrived'] = pd.to_datetime(All_Clean_Reduced['Arrived']).dt.hour  #make this a dummy variable
 
-
 # Replace category nan with "none" text, (shows warning)
 All_Clean_Reduced['Category id'].loc[All_Clean_Reduced['Category id'].isna()] = 'none'
 
@@ -128,10 +127,8 @@ All_Clean_Condensed['CT'] = (All_Clean_Condensed['Category id'].str.contains('2.
 # Remove columns if no longer needed for whatever reason
 All_Clean_Condensed.dtypes
 All_Clean_Dropped = All_Clean_Condensed.drop(['CSN', 'Arrival Method', 'CC', 'Postal Code',
-                                              'Province','Category id'  ], axis=1)
-# Rename columns that are wordy or unclear
-
-# Confirm all the columns are in useable format
+                                              'Province','Category id' ], axis=1)
+# Confirm all the columns are in use-able format
 
 # Confirm all the columns are without nulls
 
