@@ -67,15 +67,8 @@ All_Clean_Reduced = All_Clean_Reduced.drop(All_Clean_Reduced.columns[di_mrn], ax
 
 # Arrived should focus hour of the day arrived, datetime format not likely useful for model
 All_Clean_Reduced.dtypes
-All_Clean_Reduced['Arrived'] = pd.to_datetime(All_Clean_Reduced['Arrived']).dt.hour
+All_Clean_Reduced['Arrived'] = pd.to_datetime(All_Clean_Reduced['Arrived']).dt.hour  #make this a dummy variable
 
-"""
-Notable Categories for prediction
-10 = X-Ray
-9 = UltraSound
-7 =  MRI
-2 = CT
-"""
 
 # Replace category nan with "none" text, (shows warning)
 All_Clean_Reduced['Category id'].loc[All_Clean_Reduced['Category id'].isna()] = 'none'
@@ -96,16 +89,36 @@ All_Clean_Condensed = pd.concat([All_Clean_Condensed, dummies], axis=1)
 dummies = pd.get_dummies(All_Clean_Condensed['Day of Arrival']).rename(columns=lambda x: 'Day_of_Arrival' + str(x))
 All_Clean_Condensed = pd.concat([All_Clean_Condensed, dummies], axis=1)
 
-# Arrival Method simplified greatly , find the big ones , those get a 1/0 for containing, absense of all of them is a thing
-test = All_Clean_Condensed.groupby('Arrival Method').count()
+# Arrival Method simplified greatly , find the big ones , those get a 1/0 for containing
+Arrival_Method_Options = All_Clean_Condensed.groupby('Arrival Method').count().sort_values('CSN',ascending = False)
+"""
+Biggest Options: 
+Ambula
+Walk
+Car
+"""
+All_Clean_Condensed['Method_Ambulance'] = (All_Clean_Condensed['Arrival Method'].str.contains('Ambula'))
+All_Clean_Condensed['Method_Walk'] = (All_Clean_Condensed['Arrival Method'].str.contains('Walk'))
+All_Clean_Condensed['Method_Car'] = (All_Clean_Condensed['Arrival Method'].str.contains('Car'))
 
-## CC simplified Greatly, try to encapsulate big key words, fever, abdominal
-test = All_Clean_Condensed.groupby('CC').count()
+## CC simplified Greatly, find big key words,
+CC_Options = All_Clean_Condensed.groupby('CC').count().sort_values('CSN',ascending = False)
+CC_Options = CC_Options.loc[CC_Options['CSN']>500]
 
+# capture each index option that has more than 500 people
+cc_list =  CC_Options.index.values.astype(str)
 
+# do a regex check for each of those columns, create a columns that is named CC_X
+for x in cc_list:
+    All_Clean_Condensed[x] = All_Clean_Condensed['CC'].str.contains(x)
 
 """
-
+Notable Categories for prediction
+10 = X-Ray
+9 = UltraSound
+7 =  MRI
+2 = CT
+"""
 # Convert the category id column into 4 columns based on delimiter
 All_Clean_Condensed['X-Ray'] = (All_Clean_Condensed['Category id'].str.contains('10.0'))
 All_Clean_Condensed['US'] = (All_Clean_Condensed['Category id'].str.contains('9.0'))
@@ -114,10 +127,8 @@ All_Clean_Condensed['CT'] = (All_Clean_Condensed['Category id'].str.contains('2.
 
 # Remove columns if no longer needed for whatever reason
 All_Clean_Condensed.dtypes
-All_Clean_Condensed = All_Clean_Condensed.drop(['', '', '', '', '', ], axis=1)
-
-
-
+All_Clean_Dropped = All_Clean_Condensed.drop(['CSN', 'Arrival Method', 'CC', 'Postal Code',
+                                              'Province','Category id'  ], axis=1)
 # Rename columns that are wordy or unclear
 
 # Confirm all the columns are in useable format
