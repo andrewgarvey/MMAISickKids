@@ -238,5 +238,5 @@ ED_Clean.shape # i consider this acceptable loses for a proof of concept model m
 ED_Clean.dtypes # looks fine
 
 # write that to csv for usage later
+ED_Clean.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/ED_Clean', index = None, header=True)
 
-ED_Clean.to_csv()

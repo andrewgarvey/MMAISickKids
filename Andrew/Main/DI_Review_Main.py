@@ -9,6 +9,13 @@ Title: DI_Review_Main
 Purpose:
 - Clean the DI data for future analysis
 """
+
+# clear user created variables
+for name in dir():
+    if not name.startswith('_'):
+        del globals()[name]
+
+del name
 ## Edited to remove ED things and change
 
 import numpy as np
@@ -76,4 +83,6 @@ finalizing_physician = finalizing_physician.rename(columns={'Authorizing Provide
 di_data = pd.merge(di_data, finalizing_physician, how='left', on='Finalizing Physician')
 
 di_data = di_data.drop(['Category', 'Procedure', 'Authorizing Provider', 'Name'], axis=1)
+
+di_data.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/DI_Clean', index = None, header=True)
 
