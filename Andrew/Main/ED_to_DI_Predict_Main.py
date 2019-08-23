@@ -40,7 +40,7 @@ ED_Clean.shape
 # DI Timeframe entirely encompasses ED, so if they got a test they should be here.
 
 # Could not find a clean way to do this that wouldnt take a bunch of extra work in python, using sql
-pysqldf = lambda q: sqldf(q, globals())  # believe this imports all variables to be able to be used in sql
+pysqldf = lambda q: sqldf(q, globals())  # Imports all current global variables to be able to be used in sql as df
 
 All_Clean = pysqldf("SELECT * FROM ED_Clean AS e "
                     "LEFT JOIN DI_Clean AS d " #  left join because NO tests is a valid answer to incoming patient
@@ -48,7 +48,18 @@ All_Clean = pysqldf("SELECT * FROM ED_Clean AS e "
                     "AND e.Arrived < d.[Order Time]"  #  arrived before order
                     "AND e.[Disch Date/Time] > d.[Order Time]")  # discharged after order
 
-# Drop rows that we cannot possible have at the time this model aims to be used (nearly all of DI, some of ED)
-# Later we might have to attempt to quantify how paths of people work out
 All_Clean.isna().sum()
 
+# Drop rows that we cannot possibly have AT THE TIME this Model aims to be used (nearly all of DI, some of ED)
+All_Clean_Reduced = All_Clean.drop(['ED Completed Length of Stay (Minutes)', 'Roomed', 'Disch Date/Time', 'Dispo',
+                                    'Roomed to Discharge', 'Roomed to Discharge', 'Arrived to Discharge',
+                                    'End Exam Time', 'Order Time', 'Finalized Time', 'Finalizing Physician', 'Order ID',
+                                    'Order to Protocolled (min)', 'Protocolled to Begin (min)', 'Order to Begin (min)',
+                                    'Begin to End (min)', 'End to Prelim (min)', 'End to Sign (min)',
+                                    'Order to End (min)', 'Order to Sign (min)', 'Protocolling Instant', 'Procedure id',
+                                    'Authorizing Provider id', 'Finalizing Physician id' ], axis=1)
+#drop second mrn
+# Tiny bit of renaming,
+
+
+# Arrived might want to be put into hours of the day, dummy variable wise
