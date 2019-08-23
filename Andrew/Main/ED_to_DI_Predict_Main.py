@@ -77,11 +77,11 @@ Notable Categories for prediction
 2 = CT
 """
 
-# Replace category nan with "none" text
+# Replace category nan with "none" text, (shows warning)
 All_Clean_Reduced['Category id'].loc[All_Clean_Reduced['Category id'].isna()] = 'none'
 
-# Figure out how to condense by CSN multiple visits and group up the respective categories
-
+# Aggregate by everything except category or just csn, make a delimited column for this, (takes a few minutes)
+All_Clean_Condensed = All_Clean_Reduced.groupby('CSN', as_index=False).agg(lambda x: ', '.join(set(x.astype(str))))
 
 # Dummy Variable all the things of relevance that should be converted to dummy variables
 
