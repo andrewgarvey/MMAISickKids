@@ -28,6 +28,8 @@ from pandasql import sqldf
 
 #Set dir
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/')
+#------------------------------------------------------------------------------------------------------------------------
+# Final Cleaning towards ML usable Model DF
 
 #Import Cleaned Datasets
 ED_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/ED_Clean')
@@ -39,7 +41,7 @@ ED_Clean.shape
 # Or just no tests for that visit is ok too, this will show up as null
 # DI Timeframe entirely encompasses ED, so if they got a test they should be here.
 
-# Could not find a clean way to do this that wouldnt take a bunch of extra work in python, using sql
+# Could not find a clean way to do this that wouldn't take a bunch of extra work in python, using sql
 pysqldf = lambda q: sqldf(q, globals())  # Imports all current global variables to be able to be used in sql as df
 
 All_Clean = pysqldf("SELECT * FROM ED_Clean AS e "
@@ -57,9 +59,42 @@ All_Clean_Reduced = All_Clean.drop(['ED Completed Length of Stay (Minutes)', 'Ro
                                     'Order to Protocolled (min)', 'Protocolled to Begin (min)', 'Order to Begin (min)',
                                     'Begin to End (min)', 'End to Prelim (min)', 'End to Sign (min)',
                                     'Order to End (min)', 'Order to Sign (min)', 'Protocolling Instant', 'Procedure id',
-                                    'Authorizing Provider id', 'Finalizing Physician id' ], axis=1)
-#drop second mrn
-# Tiny bit of renaming,
+                                    'Authorizing Provider id', 'Finalizing Physician id', 'Arrived to Roomed' ], axis=1)
+
+# drop second mrn column
+di_mrn = len(All_Clean_Reduced.columns) -2 #  second last column is dupe mrn
+All_Clean_Reduced = All_Clean_Reduced.drop(All_Clean_Reduced.columns[di_mrn], axis=1)
+
+# Arrived should focus hour of the day arrived, datetime format not likely useful for model
+All_Clean_Reduced.dtypes
+All_Clean_Reduced['Arrived'] = pd.to_datetime(All_Clean_Reduced['Arrived']).dt.hour
+
+"""
+Notable Categories for prediction
+10 = X-Ray
+9 = UltraSound
+7 =  MRI
+2 = CT
+"""
+
+# Replace category nan with "none" text
+All_Clean_Reduced['Category id'].loc[All_Clean_Reduced['Category id'].isna()] = 'none'
+
+# Figure out how to condense by CSN multiple visits and group up the respective categories
 
 
-# Arrived might want to be put into hours of the day, dummy variable wise
+# Dummy Variable all the things of relevance that should be converted to dummy variables
+
+# Remove a column if dummy variables wasn't viable
+
+# Renaming columns that are wordy or unclear
+
+# Confirm all the columns are in useable format
+
+# Confirm all the columns are without nulls
+# -----------------------------------------------------------------------------------------------------------------------
+# Actually Do a model with purely the info we have here, LR or Random Forest Sounds good, multi-classification
+
+
+
+

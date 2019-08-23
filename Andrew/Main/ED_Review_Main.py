@@ -225,13 +225,13 @@ ED_Clean_w_null = ED_Reduced.drop(['Age at Visit','Last Weight','Current Medicat
 ED_Clean_w_null.describe().transpose()
 
 # ----------------------------------------------------------------------------------------------------------------------
-## Making the last step towards a perfect ML usable Dataframe
+## Making the last step towards a clean dataset worth looking at for insights
 
-# Remove or replace all Nulls, either impute or remove rows or remove columns
+# Remove or replace all Nulls
 ED_Clean = ED_Clean_w_null.dropna()
 
 ED_Clean_w_null.shape
-ED_Clean.shape # i consider this acceptable loses for a proof of concept model making
+ED_Clean.shape # I consider this acceptable loses for a proof of concept model making
 # if certain columns seem super good predictors, find a way to insert when making the pipeline.
 
 # Check out formats and what not for proper data types, want integers/factors

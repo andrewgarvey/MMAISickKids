@@ -54,25 +54,27 @@ di_data['Order Time'] = pd.to_datetime(di_data['Order Time'], format="%Y/%m/%d %
 di_data['Finalized Time'] = pd.to_datetime(di_data['Finalized Time'], format="%d/%m/%Y %I:%M:%S %p", errors='coerce')
 di_data['Protocolling Instant'] = pd.to_datetime(di_data['Protocolling Instant'], format="%d/%m/%Y %I:%M %p", errors='coerce')
 
-#create a categories df
+# create a categories df
 categories = pd.DataFrame(di_data[['Category']])
 categories['Category id'] = categories.groupby(['Category']).ngroup()
 categories = categories.drop_duplicates()
 categories = categories.sort_values('Category id')
 
-#create a procedure  df
+
+
+# create a procedure  df
 procedures = pd.DataFrame(di_data[['Procedure']])
 procedures['Procedure id'] = procedures.groupby(['Procedure']).ngroup()
 procedures = procedures.drop_duplicates()
 procedures = procedures.sort_values('Procedure id')
 
-#create Authorizing Provider df
+# create Authorizing Provider df
 authorizing_provider = pd.DataFrame(di_data[['Authorizing Provider']])
 authorizing_provider['Authorizing Provider id'] = authorizing_provider.groupby(['Authorizing Provider']).ngroup()
 authorizing_provider = authorizing_provider.drop_duplicates()
 authorizing_provider = authorizing_provider.sort_values('Authorizing Provider id')
 
-#combine di_data set with newly created dfs that have ids
+# combine di_data set with newly created dfs that have ids
 di_data = pd.merge(di_data, categories, how='left', on='Category')
 di_data = pd.merge(di_data, procedures, how='left', on='Procedure')
 di_data = pd.merge(di_data, authorizing_provider, how='left', on='Authorizing Provider')
@@ -81,6 +83,9 @@ finalizing_physician = authorizing_provider.copy()
 finalizing_physician = finalizing_physician.rename(columns={'Authorizing Provider': 'Finalizing Physician', 'Authorizing Provider id': 'Finalizing Physician id'})
 
 di_data = pd.merge(di_data, finalizing_physician, how='left', on='Finalizing Physician')
+
+# Andrew Check what is what
+di_data.groupby('Category')['Category id'].count()
 
 di_data = di_data.drop(['Category', 'Procedure', 'Authorizing Provider', 'Name'], axis=1)
 
