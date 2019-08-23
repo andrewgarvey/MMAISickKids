@@ -83,11 +83,20 @@ All_Clean_Reduced['Category id'].loc[All_Clean_Reduced['Category id'].isna()] = 
 # Aggregate by everything except category or just csn, make a delimited column for this, (takes a few minutes)
 All_Clean_Condensed = All_Clean_Reduced.groupby('CSN', as_index=False).agg(lambda x: ', '.join(set(x.astype(str))))
 
+# Convert the category id column into 4 columns based on delimiter
+All_Clean_Condensed['X-Ray'] = (All_Clean_Condensed['Category id'].str.contains('10.0'))
+All_Clean_Condensed['US'] = (All_Clean_Condensed['Category id'].str.contains('9.0'))
+All_Clean_Condensed['MRI'] = (All_Clean_Condensed['Category id'].str.contains('7.0'))
+All_Clean_Condensed['CT'] = (All_Clean_Condensed['Category id'].str.contains('2.0'))
+
 # Dummy Variable all the things of relevance that should be converted to dummy variables
+# not viable for CC, postal code, maybe later
+# arrival method, Arrived(the hours one), day of arrival, province,
 
-# Remove a column if dummy variables wasn't viable
 
-# Renaming columns that are wordy or unclear
+# Remove columns if no longer needed for whatever reason
+
+# Rename columns that are wordy or unclear
 
 # Confirm all the columns are in useable format
 
