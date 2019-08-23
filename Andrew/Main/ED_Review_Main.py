@@ -40,7 +40,7 @@ ED_2019_May = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/May_ClinData_2019
 ED_2019_Jun = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/June_ClinData_2019.xlsx')
 
 # All results will go to output path
-os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/ED_Review_Output/')
+os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Data Merging
@@ -231,9 +231,12 @@ ED_Clean_w_null.describe().transpose()
 ED_Clean = ED_Clean_w_null.dropna()
 
 ED_Clean_w_null.shape
-ED_Clean.shape # i consider this acceptable loses for a proof of concept
+ED_Clean.shape # i consider this acceptable loses for a proof of concept model making
+# if certain columns seem super good predictors, find a way to insert when making the pipeline.
 
 # Check out formats and what not for proper data types, want integers/factors
 ED_Clean.dtypes # looks fine
 
-# Check in on unique values of each column to make sure they are ok
+# write that to csv for usage later
+
+ED_Clean.to_csv()
