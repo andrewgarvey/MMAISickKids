@@ -81,7 +81,30 @@ Notable Categories for prediction
 All_Clean_Reduced['Category id'].loc[All_Clean_Reduced['Category id'].isna()] = 'none'
 
 # Aggregate by everything except category or just csn, make a delimited column for this, (takes a few minutes)
-All_Clean_Condensed = All_Clean_Reduced.groupby('CSN', as_index=False).agg(lambda x: ', '.join(set(x.astype(str))))
+All_Clean_Condensed_orig = All_Clean_Reduced.groupby('CSN', as_index=False).agg(lambda x: ', '.join(set(x.astype(str))))
+All_Clean_Condensed = All_Clean_Condensed_orig  # because it takes a while
+
+# Dummy Variable all the things of relevance that should be converted to dummy variables
+# not viable for CC, postal code, maybe later.
+# Arrived(the hours one), day of arrival, province,
+dummies = pd.get_dummies(All_Clean_Condensed['Province']).rename(columns=lambda x: 'Province_' + str(x))
+All_Clean_Condensed = pd.concat([All_Clean_Condensed, dummies], axis=1)
+
+dummies = pd.get_dummies(All_Clean_Condensed['Arrived']).rename(columns=lambda x: 'Arrived_Hour' + str(x))
+All_Clean_Condensed = pd.concat([All_Clean_Condensed, dummies], axis=1)
+
+dummies = pd.get_dummies(All_Clean_Condensed['Day of Arrival']).rename(columns=lambda x: 'Day_of_Arrival' + str(x))
+All_Clean_Condensed = pd.concat([All_Clean_Condensed, dummies], axis=1)
+
+# Arrival Method simplified greatly , find the big ones , those get a 1/0 for containing, absense of all of them is a thing
+test = All_Clean_Condensed.groupby('Arrival Method').count()
+
+## CC simplified Greatly, try to encapsulate big key words, fever, abdominal
+test = All_Clean_Condensed.groupby('CC').count()
+
+
+
+"""
 
 # Convert the category id column into 4 columns based on delimiter
 All_Clean_Condensed['X-Ray'] = (All_Clean_Condensed['Category id'].str.contains('10.0'))
@@ -89,18 +112,20 @@ All_Clean_Condensed['US'] = (All_Clean_Condensed['Category id'].str.contains('9.
 All_Clean_Condensed['MRI'] = (All_Clean_Condensed['Category id'].str.contains('7.0'))
 All_Clean_Condensed['CT'] = (All_Clean_Condensed['Category id'].str.contains('2.0'))
 
-# Dummy Variable all the things of relevance that should be converted to dummy variables
-# not viable for CC, postal code, maybe later
-# arrival method, Arrived(the hours one), day of arrival, province,
-
-
 # Remove columns if no longer needed for whatever reason
+All_Clean_Condensed.dtypes
+All_Clean_Condensed = All_Clean_Condensed.drop(['', '', '', '', '', ], axis=1)
+
+
 
 # Rename columns that are wordy or unclear
 
 # Confirm all the columns are in useable format
 
 # Confirm all the columns are without nulls
+
+
+# Write it to csv for easy reference
 # -----------------------------------------------------------------------------------------------------------------------
 # Actually Do a model with purely the info we have here, LR or Random Forest Sounds good, multi-classification
 
