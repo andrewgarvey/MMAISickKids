@@ -18,10 +18,7 @@ del name
 
 #Basic Imports
 import numpy as np
-import scipy as sp
 import pandas as pd
-import matplotlib as mpl
-import datetime as dt
 import os
 
 #Models
@@ -30,13 +27,14 @@ from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, precision_recall_curve, auc, roc_auc_score, roc_curve, recall_score, classification_report
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, precision_recall_curve, auc, roc_auc_score, \
+                            roc_curve, recall_score, classification_report
 
 # set seed
 Random_State = 42
 
 # ----------------------------------------------------------------------------------------------------------------------
-## Prep data splits
+# Prep data splits
 # Import data
 ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
 
@@ -55,7 +53,7 @@ X_train = scale.fit_transform(X_train)
 X_test = scale.fit_transform(X_test)
 
 # ----------------------------------------------------------------------------------------------------------------------
-## Basic Random Forest
+# Basic Random Forest
 # Set initial directory
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Random_Forest')
 
@@ -69,12 +67,12 @@ grid_params_rf = [{'clf__bootstrap': [True],
                    'clf__max_features': [None],
                    'clf__min_samples_leaf': [2],
                    'clf__min_samples_split': [15],
-                   'clf__n_estimators' : [300]
+                   'clf__n_estimators' : [100]
                    }]
 grid_cv = 3
 jobs = -1
 
-for index in range(0, len(Modalities)):
+# for index in range(0, len(Modalities)):
 
 index = 0
 # get the Modalities name for this loop
@@ -85,26 +83,37 @@ print("*********** Modality = " + Modality + " ***********")
 # set the y train with the target variable
 y_train_modality = y_train.iloc[:, y_train.columns == Modality].values.reshape(-1, )
 
+# Set the model conditions, run the model
 grid = GridSearchCV(estimator = pipe_rf, param_grid = grid_params_rf, scoring = 'roc_auc', cv = grid_cv, n_jobs = jobs,verbose = 1)
 
 grid.fit(X_train,np.ravel(y_train_modality))
 
-print(grid.best_score_)
-print(grid.best_params_)
+# Evaluate training results
+print("*********** Training Results ***********")
+print("Best Roc Auc Score: " + str(grid.best_score_))
+print("Best Parameters: " + str(grid.best_params_))
 
-pred = grid.predict_proba(x_test)
-pred = pred[:,1]
-actual = y_test
+# Predict on Test Data
+pred_binary = grid.predict(X_test)
+pred = grid.predict_proba(X_test)
+pred_proba = pred[:,1]
+y_test_modality = y_test.iloc[:, y_test.columns == Modality].values.reshape(-1, )
 
-# observe results
+# Evaluate Testing Results
+# binary
+print("*********** Test Binary Results ***********")
+print("Confusion Matrix: \n" + str(confusion_matrix(y_test_modality, pred_binary)))
+print("Classification Report:  \n" + str(classification_report(y_test_modality,pred_binary)))
+print("Accuracy: " + str(accuracy_score(y_test_modality,pred_binary)))
 
-print(auc(fpr,tpr))
+# probabilistic
+print("*********** Test Probabilistic Results ***********")
+roc_curve(y_test_modality,pred_proba)
 
-pred_binary = grid.predict(x_test)
-print(confusion_matrix(actual,pred_binary))
 
 # ----------------------------------------------------------------------------------------------------------------------
-## Logistic Regression
+"""
+# Logistic Regression
 # Set initial directory
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logistic_Regression')
 
@@ -135,7 +144,7 @@ y_train_modality = y_train.iloc[:, y_train.columns == Modality].values.reshape(-
 print(">> finding best params")
 LR_model = model_selection.GridSearchCV(linear_model.LogisticRegression(random_state=123),
                                    parameters, scoring="neg_log_loss",
-                                   cv=3, n_jobs=-1, verbose=1)
+                                   cv=2, n_jobs=-1, verbose=1)
 LR_model.fit(X_train, y_train_modality)
 best_params = LR_model.best_params_
 print(">> best params: ", best_params)
@@ -151,3 +160,4 @@ print(">> done saving validation info")
 
 
 # Check out results, in particular confusion matrix, I think what we aim for is a good ROC curve stats,
+"""
