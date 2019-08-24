@@ -44,12 +44,10 @@ Modalities = ['X-Ray', 'US', 'MRI', 'CT']
 X = ML_Clean.drop(Modalities, axis=1)
 y = ML_Clean[Modalities]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.80, random_state=Random_State)
-
-# Split train and test, randomly 80/20 and also split each of the y away from x
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=Random_State)
 
 # ----------------------------------------------------------------------------------------------------------------------
-## Basic Random forest
+## Basic Random Forest
 
 # Set initial directory
 
@@ -65,12 +63,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.80, random
 ## Logistic Regression
 
 # Set initial directory
-os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/LogisticRegression')
 
 # Set all the hyper-variables
 
-
 # some loop that does random forest but for each of the aimed predictions
-
 
 # Check out results, in particular confusion matrix, I think what we aim for is a good ROC curve stats,
