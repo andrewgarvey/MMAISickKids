@@ -32,12 +32,11 @@ from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, precisio
 
 # ----------------------------------------------------------------------------------------------------------------------
 ## Prep data splits
-
 # Import data
 ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
 
 # Split data for modeling
-
+test = a
 
 # Split train and test, randomly 80/20 and also split each of the y away from x
 
