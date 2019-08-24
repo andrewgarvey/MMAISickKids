@@ -107,7 +107,7 @@ CC_Options = CC_Options.loc[CC_Options['CSN']>500]
 # capture each index option that has more than 500 people
 cc_list =  CC_Options.index.values.astype(str)
 
-# do a regex check for each of those columns, create a columns that is named CC_X
+# do a regex check for each of those columns
 for x in cc_list:
     All_Clean_Condensed[x] = All_Clean_Condensed['CC'].str.contains(x)
 
@@ -118,6 +118,7 @@ Notable Categories for prediction
 7 =  MRI
 2 = CT
 """
+
 # Convert the category id column into 4 columns based on delimiter
 All_Clean_Condensed['X-Ray'] = (All_Clean_Condensed['Category id'].str.contains('10.0'))
 All_Clean_Condensed['US'] = (All_Clean_Condensed['Category id'].str.contains('9.0'))
@@ -125,18 +126,14 @@ All_Clean_Condensed['MRI'] = (All_Clean_Condensed['Category id'].str.contains('7
 All_Clean_Condensed['CT'] = (All_Clean_Condensed['Category id'].str.contains('2.0'))
 
 # Remove columns if no longer needed for whatever reason
-All_Clean_Condensed.dtypes
 All_Clean_Dropped = All_Clean_Condensed.drop(['CSN', 'Arrival Method', 'CC', 'Postal Code',
                                               'Province','Category id' ], axis=1)
 # Confirm all the columns are in use-able format
+test = All_Clean_Dropped.dtypes
 
 # Confirm all the columns are without nulls
-
+All_Clean_Dropped.isna().sum()
 
 # Write it to csv for easy reference
+All_Clean_Dropped.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/ML_Clean', index = None, header=True)
 # -----------------------------------------------------------------------------------------------------------------------
-# Actually Do a model with purely the info we have here, LR or Random Forest Sounds good, multi-classification
-
-
-
-
