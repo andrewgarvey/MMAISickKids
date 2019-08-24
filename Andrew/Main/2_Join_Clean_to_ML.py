@@ -78,6 +78,7 @@ All_Clean_Condensed = All_Clean_Condensed_orig  # because it takes a while
 # Dummy Variable all the things of relevance that should be converted to dummy variables
 # not viable for CC, postal code, maybe later.
 # Arrived(the hours one), day of arrival, province,
+
 dummies = pd.get_dummies(All_Clean_Condensed['Province']).rename(columns=lambda x: 'Province_' + str(x))
 All_Clean_Condensed = pd.concat([All_Clean_Condensed, dummies], axis=1)
 
@@ -89,12 +90,14 @@ All_Clean_Condensed = pd.concat([All_Clean_Condensed, dummies], axis=1)
 
 # Arrival Method simplified greatly , find the big ones , those get a 1/0 for containing
 Arrival_Method_Options = All_Clean_Condensed.groupby('Arrival Method').count().sort_values('CSN',ascending = False)
+
 """
 Biggest Options: 
-Ambula
+Ambula  (covers ambulance/ambulatory)
 Walk
 Car
 """
+
 All_Clean_Condensed['Method_Ambulance'] = (All_Clean_Condensed['Arrival Method'].str.contains('Ambula'))
 All_Clean_Condensed['Method_Walk'] = (All_Clean_Condensed['Arrival Method'].str.contains('Walk'))
 All_Clean_Condensed['Method_Car'] = (All_Clean_Condensed['Arrival Method'].str.contains('Car'))
