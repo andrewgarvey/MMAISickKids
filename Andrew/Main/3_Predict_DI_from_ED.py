@@ -24,11 +24,14 @@ import matplotlib as mpl
 import datetime as dt
 import os
 
-# ML based imports
+#Models
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, precision_recall_curve, auc, roc_auc_score, roc_curve, recall_score, classification_report
+
+# set seed
+Random_State = 42
 
 # ----------------------------------------------------------------------------------------------------------------------
 ## Prep data splits
@@ -36,7 +39,12 @@ from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, precisio
 ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
 
 # Split data for modeling
-test = a
+Modalities = ['X-Ray', 'US', 'MRI', 'CT']
+
+X = ML_Clean.drop(Modalities, axis=1)
+y = ML_Clean[Modalities]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.80, random_state=Random_State)
 
 # Split train and test, randomly 80/20 and also split each of the y away from x
 
