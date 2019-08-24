@@ -136,7 +136,18 @@ All_Clean_Dropped = All_Clean_Condensed.drop(['CSN', 'Arrival Method', 'CC', 'Po
 # Confirm all the columns are in use-able format
 test = All_Clean_Dropped.dtypes
 
+# convert everything that is objects to floats or int
+All_Clean_Dropped['Arrived'] = All_Clean_Dropped['Arrived'].astype(int)
+
+All_Clean_Dropped['Last Weight formatted'] = pd.to_numeric(All_Clean_Dropped['Last Weight formatted'], errors='coerce')
+All_Clean_Dropped['Pulse Formatted'] = pd.to_numeric(All_Clean_Dropped['Pulse Formatted'], errors='coerce')
+All_Clean_Dropped['Resp Formatted'] = pd.to_numeric(All_Clean_Dropped['Resp Formatted'], errors='coerce')
+All_Clean_Dropped['Temp Formatted'] = pd.to_numeric(All_Clean_Dropped['Temp Formatted'], errors='coerce')
+
+
+
 # Confirm all the columns are without nulls
+All_Clean_Dropped = All_Clean_Dropped.dropna()
 All_Clean_Dropped.isna().sum()
 
 # Write it to csv for easy reference
