@@ -88,6 +88,9 @@ All_Clean_Condensed = pd.concat([All_Clean_Condensed, dummies], axis=1)
 dummies = pd.get_dummies(All_Clean_Condensed['Day of Arrival']).rename(columns=lambda x: 'Day_of_Arrival' + str(x))
 All_Clean_Condensed = pd.concat([All_Clean_Condensed, dummies], axis=1)
 
+dummies = pd.get_dummies(All_Clean_Condensed['Gender']).rename(columns=lambda x: 'Gender_' + str(x))
+All_Clean_Condensed = pd.concat([All_Clean_Condensed, dummies], axis=1)
+
 # Arrival Method simplified greatly , find the big ones , those get a 1/0 for containing
 Arrival_Method_Options = All_Clean_Condensed.groupby('Arrival Method').count().sort_values('CSN',ascending = False)
 
@@ -129,7 +132,7 @@ All_Clean_Condensed['CT'] = (All_Clean_Condensed['Category id'].str.contains('2.
 
 # Remove columns if no longer needed for whatever reason
 All_Clean_Dropped = All_Clean_Condensed.drop(['CSN', 'Arrival Method', 'CC', 'Postal Code',
-                                              'Province','Category id' ], axis=1)
+                                              'Province','Category id','Day of Arrival', 'Gender' ], axis=1)
 # Confirm all the columns are in use-able format
 test = All_Clean_Dropped.dtypes
 
