@@ -40,7 +40,7 @@ ED_2019_May = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/May_ClinData_2019
 ED_2019_Jun = pd.read_excel ('/home/andrew/Public/ED_Epic_Data/June_ClinData_2019.xlsx')
 
 # All results will go to output path
-os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/')
+os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Data Merging
@@ -238,5 +238,5 @@ ED_Clean.shape # I consider this acceptable loses for a proof of concept model m
 ED_Clean.dtypes # looks fine
 
 # write that to csv for usage later
-ED_Clean.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/ED_Clean', index = None, header=True)
+ED_Clean.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ED_Clean.csv', index = None, header=True)
 

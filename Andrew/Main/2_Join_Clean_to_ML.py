@@ -26,13 +26,13 @@ from pandasql import sqldf
 
 
 #Set dir
-os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/')
+os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/')
 #------------------------------------------------------------------------------------------------------------------------
 # Final Cleaning towards ML usable Model DF
 
 #Import Cleaned Datasets
-ED_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/ED_Clean')
-DI_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/DI_Clean')
+ED_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ED_Clean.csv')
+DI_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/DI_Clean.csv')
 
 ED_Clean.shape
 
@@ -134,5 +134,5 @@ test = All_Clean_Dropped.dtypes
 All_Clean_Dropped.isna().sum()
 
 # Write it to csv for easy reference
-All_Clean_Dropped.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/ML_Clean', index = None, header=True)
+All_Clean_Dropped.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv', index = None, header=True)
 # -----------------------------------------------------------------------------------------------------------------------

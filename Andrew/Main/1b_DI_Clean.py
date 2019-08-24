@@ -25,7 +25,7 @@ import matplotlib as mpl
 import datetime as dt
 import os
 
-os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/')
+os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/')
 
 #import ED DI Data
 
@@ -89,5 +89,5 @@ di_data.groupby('Category')['Category id'].count()
 
 di_data = di_data.drop(['Category', 'Procedure', 'Authorizing Provider', 'Name'], axis=1)
 
-di_data.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/DI_Clean', index = None, header=True)
+di_data.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/DI_Clean.csv', index = None, header=True)
 

@@ -16,25 +16,54 @@ for name in dir():
 
 del name
 
+#Basic Imports
 import numpy as np
 import scipy as sp
 import pandas as pd
 import matplotlib as mpl
 import datetime as dt
 import os
-from pandasql import sqldf
 
-#Set dir
-os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/')
+# ML based imports
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix, precision_recall_curve, auc, roc_auc_score, roc_curve, recall_score, classification_report
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Actually Do a model with purely the info we have here, LR or Random Forest Sounds good, multi-classification
-ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Output/ML_Clean')
+## Prep data splits
 
-# May have to go back and change things
+# Import data
+ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
 
-#
-
-
+# Split data for modeling
 
 
+# Split train and test, randomly 80/20 and also split each of the y away from x
+
+# ----------------------------------------------------------------------------------------------------------------------
+## Basic Random forest
+
+# Set initial directory
+
+# Set all the hyper-variables
+
+
+# some loop that does random forest but for each of the aimed predictions
+
+
+# Check out results, in particular confusion matrix, I think what we aim for is a good ROC curve stats,
+
+# ----------------------------------------------------------------------------------------------------------------------
+## Logistic Regression
+
+# Set initial directory
+os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/LogisticRegression')
+
+# Set all the hyper-variables
+
+
+# some loop that does random forest but for each of the aimed predictions
+
+
+# Check out results, in particular confusion matrix, I think what we aim for is a good ROC curve stats,
