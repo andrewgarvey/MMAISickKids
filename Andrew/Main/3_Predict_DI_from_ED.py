@@ -26,6 +26,7 @@ import os
 
 #Models
 from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -58,10 +59,10 @@ X_test = scale.fit_transform(X_test)
 # Set initial directory
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Random_Forest')
 
-# set pipeline of activities
+# set pipeline
 pipe_rf = Pipeline([('clf', RandomForestClassifier(random_state = 42))])
 
-#hyper various params
+# set params
 grid_params_rf = [{'clf__bootstrap': [True],
                    'clf__criterion': ['entropy'],
                    'clf__max_depth': [None],
@@ -73,9 +74,20 @@ grid_params_rf = [{'clf__bootstrap': [True],
 grid_cv = 3
 jobs = -1
 
+for index in range(0, len(Modalities)):
+
+index = 0
+# get the Modalities name for this loop
+Modality = Modalities[index]
+
+print("*********** Modality = " + Modality + " ***********")
+
+# set the y train with the target variable
+y_train_modality = y_train.iloc[:, y_train.columns == Modality].values.reshape(-1, )
+
 grid = GridSearchCV(estimator = pipe_rf, param_grid = grid_params_rf, scoring = 'roc_auc', cv = grid_cv, n_jobs = jobs,verbose = 1)
 
-grid.fit(x_train,np.ravel(y_train))
+grid.fit(X_train,np.ravel(y_train_modality))
 
 print(grid.best_score_)
 print(grid.best_params_)
