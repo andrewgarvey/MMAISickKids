@@ -1,13 +1,13 @@
 """
 Author: Andrew Garvey
 Partner: Sargon Morad
-Date: July 1st, 2019
+Date: Aug 23, 2019
 Client: Hospital for Sick Children
 
-Title: ED_Review_Main
+Title: ED_DI_to_ML
 
 Purpose:
--   Develop a model to predict DI demand using ED triage data, also try to add outside available factors
+-   Turn cleaned data into usable ml data
 """
 # clear user created variables
 for name in dir():
@@ -15,7 +15,6 @@ for name in dir():
         del globals()[name]
 
 del name
-## Edited to remove ED things and change
 
 import numpy as np
 import scipy as sp
