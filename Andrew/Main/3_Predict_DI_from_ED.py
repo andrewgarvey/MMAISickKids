@@ -22,12 +22,14 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
+from imblearn.over_sampling import SMOTE
+from collections import Counter
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import accuracy_score, confusion_matrix, auc, roc_auc_score, roc_curve,  classification_report
+#from sklearn.preprocessing import StandardScaler
+
 
 # set seed
 Random_State = 42
@@ -45,6 +47,8 @@ y = ML_Clean[Modalities]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=Random_State)
 
+# smote set up
+sm=SMOTE(random_state=Random_State)
 """
 # scaling (omitted to retain readability, actual implemented model should consider it)
 scale = StandardScaler()
@@ -59,15 +63,15 @@ X_test = scale.fit_transform(X_test)
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Random_Forest')
 
 # set params
-grid_params_rf = [{'clf__bootstrap': [True],
-                   'clf__criterion': ['entropy'],
-                   'clf__max_depth': [None],
-                   'clf__max_features': [None],
-                   'clf__min_samples_leaf': [2],
-                   'clf__min_samples_split': [15],
-                   'clf__n_estimators': [100]
+grid_params_rf = [{'bootstrap': [True],
+                   'criterion': ['entropy','gini'],
+                   'max_depth': [50,100],
+                   'max_features': ['log2','sqrt'],
+                   'min_samples_leaf': [50],
+                   'min_samples_split': [100,500],
+                   'n_estimators': [1000,3000]
                    }]
-grid_cv_rf = 3
+grid_cv_rf = 10
 jobs_rf = -1
 
 for index in range(0, len(Modalities)):
@@ -80,11 +84,19 @@ for index in range(0, len(Modalities)):
     # set the y train with the target variable
     y_train_modality = y_train.iloc[:, y_train.columns == Modality].values.reshape(-1, )
 
-    # Set the model conditions, run the model
-    grid = GridSearchCV(estimator=RandomForestClassifier(random_state=Random_State), param_grid=grid_params_rf, scoring='roc_auc', cv=grid_cv_rf,
-                        n_jobs=jobs_rf, verbose=1)
+    # original balance
+    print('Pre-Smote: '+ str(Counter(y_train_modality)))
 
-    grid.fit(X_train, np.ravel(y_train_modality))
+    #smote and new balance
+    X_train_smote, y_train_modality_smote = sm.fit_resample(X_train, y_train_modality)
+    print('Post-Smote: '+ str(Counter(y_train_modality_smote)))
+
+    # Set the model conditions, run the model
+    grid = GridSearchCV(estimator=RandomForestClassifier(random_state=Random_State), param_grid=grid_params_rf,
+                        scoring='roc_auc', cv=grid_cv_rf, n_jobs=jobs_rf, verbose=5)
+
+    #grid.fit(X_train, np.ravel(y_train_modality))
+    grid.fit(X_train_smote, np.ravel(y_train_modality_smote))
 
     # Evaluate training results
     print("*********** Training Results ***********")
@@ -119,11 +131,13 @@ for index in range(0, len(Modalities)):
     plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.title(str(Modality) + " ROC Curve")
+    plt.title("Random Forest " +str(Modality) + " ROC Curve")
     plt.legend(loc="lower right")
     plt.show()
 
 # ----------------------------------------------------------------------------------------------------------------------
+"""
+
 # Logistic Regression
 # Set initial directory
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logistic_Regression')
@@ -155,6 +169,13 @@ for index in range(0, len(Modalities)):
     # set the y train with the target variable
     y_train_modality = y_train.iloc[:, y_train.columns == Modality].values.reshape(-1, )
 
+    # original balance
+    print('Pre-Smote: '+ str(Counter(y_train_modality)))
+
+    #smote and new balance
+    X_train_smote, y_train_modality_smote = sm.fit_resample(X_train, y_train_modality)
+    print('Post-Smote: '+ str(Counter(y_train_modality_smote)))
+    
     # Set the model conditions, run the model
     grid = GridSearchCV(estimator=LogisticRegression(random_state=Random_State), param_grid=grid_params_lr,
                         scoring='roc_auc', cv=grid_cv_lr, n_jobs=jobs_lr, verbose=1)
@@ -198,8 +219,8 @@ for index in range(0, len(Modalities)):
     plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.title(str(Modality) + " ROC Curve")
+    plt.title("Logistic Regression "str(Modality) + " ROC Curve")
     plt.legend(loc="lower right")
     plt.show()
 
-# Check out results, in particular confusion matrix, I think what we aim for is a good ROC curve stats,
+"""
