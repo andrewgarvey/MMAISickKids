@@ -132,12 +132,11 @@ All_Clean_Condensed['CT'] = (All_Clean_Condensed['Category id'].str.contains('2.
 
 # Remove columns if no longer needed for whatever reason
 All_Clean_Dropped = All_Clean_Condensed.drop(['CSN', 'Arrival Method', 'CC', 'Postal Code',
-                                              'Province','Category id','Day of Arrival', 'Gender' ], axis=1)
+                                              'Province','Category id','Day of Arrival', 'Gender','Arrived' ], axis=1)
 # Confirm all the columns are in use-able format
 test = All_Clean_Dropped.dtypes
 
 # convert everything that is objects to floats or int
-All_Clean_Dropped['Arrived'] = All_Clean_Dropped['Arrived'].astype(int)
 
 All_Clean_Dropped['Last Weight formatted'] = pd.to_numeric(All_Clean_Dropped['Last Weight formatted'], errors='coerce')
 All_Clean_Dropped['Pulse Formatted'] = pd.to_numeric(All_Clean_Dropped['Pulse Formatted'], errors='coerce')
