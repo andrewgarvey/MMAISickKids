@@ -45,16 +45,17 @@ y = ML_Clean[Modalities]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=Random_State)
 
-# scaling
+"""
+# scaling (omitted to retain readability, actual implemented model should consider it)
 scale = StandardScaler()
 
 X_train = scale.fit_transform(X_train)
 X_test = scale.fit_transform(X_test)
-
+"""
 # ----------------------------------------------------------------------------------------------------------------------
 # Basic Random Forest
 # Set initial directory
-"""
+
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Random_Forest')
 
 # set params
@@ -121,13 +122,13 @@ for index in range(0, len(Modalities)):
     plt.title(str(Modality) + " ROC Curve")
     plt.legend(loc="lower right")
     plt.show()
-"""
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Logistic Regression
 # Set initial directory
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logistic_Regression')
 
-# Set all the hyper-variables
+# Set all the variables
 C = [0.01]
 solver = ["saga"]
 multi_class = ["multinomial"]
@@ -141,6 +142,9 @@ grid_params_lr = {'C': C,
 grid_cv_lr = 3
 jobs_lr = -1
 
+LR_weights = pd.DataFrame(pd.Series(X.columns),columns=['Columns'])
+
+
 for index in range(0, len(Modalities)):
 
     # get the Modalities name for this loop
@@ -152,8 +156,8 @@ for index in range(0, len(Modalities)):
     y_train_modality = y_train.iloc[:, y_train.columns == Modality].values.reshape(-1, )
 
     # Set the model conditions, run the model
-    grid = GridSearchCV(estimator=LogisticRegression(random_state=Random_State), param_grid=grid_params_lr, scoring='roc_auc', cv=grid_cv_lr,
-                        n_jobs=jobs_lr, verbose=1)
+    grid = GridSearchCV(estimator=LogisticRegression(random_state=Random_State), param_grid=grid_params_lr,
+                        scoring='roc_auc', cv=grid_cv_lr, n_jobs=jobs_lr, verbose=1)
 
     grid.fit(X_train, np.ravel(y_train_modality))
 
@@ -161,6 +165,10 @@ for index in range(0, len(Modalities)):
     print("*********** Training Results ***********")
     print("Best Roc Auc Score: " + str(grid.best_score_))
     print("Best Parameters: " + str(grid.best_params_))
+    print("Coefficients:")
+
+    LR_weights[str(Modality)] = pd.Series((grid.best_estimator_.coef_)[0,:])
+
 
     # Predict on Test Data
     pred_binary = grid.predict(X_test)
@@ -195,4 +203,3 @@ for index in range(0, len(Modalities)):
     plt.show()
 
 # Check out results, in particular confusion matrix, I think what we aim for is a good ROC curve stats,
-
