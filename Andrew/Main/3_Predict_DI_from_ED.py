@@ -30,7 +30,8 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import accuracy_score, confusion_matrix, auc, roc_auc_score, roc_curve,  classification_report
 #from sklearn.preprocessing import StandardScaler
 
-
+import sklearn
+sorted(sklearn.metrics.SCORERS.keys())
 # set seed
 Random_State = 42
 
@@ -45,7 +46,7 @@ Modalities = ['X-Ray', 'US', 'MRI', 'CT']
 X = ML_Clean.drop(Modalities, axis=1)
 y = ML_Clean[Modalities]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=Random_State)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=Random_State)
 
 # smote set up
 sm=SMOTE(random_state=Random_State)
@@ -57,6 +58,7 @@ X_train = scale.fit_transform(X_train)
 X_test = scale.fit_transform(X_test)
 """
 # ----------------------------------------------------------------------------------------------------------------------
+"""
 # Basic Random Forest
 # Set initial directory
 
@@ -64,15 +66,17 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Rand
 
 # set params
 grid_params_rf = [{'bootstrap': [True],
-                   'criterion': ['entropy','gini'],
-                   'max_depth': [50,100],
-                   'max_features': ['log2','sqrt'],
+                   'criterion': ['entropy'],
+                   'max_depth': [50],
+                   'max_features': ['sqrt'],
                    'min_samples_leaf': [50],
-                   'min_samples_split': [100,500],
-                   'n_estimators': [1000,3000]
+                   'min_samples_split': [5],
+                   'n_estimators': [1000]
                    }]
 grid_cv_rf = 10
-jobs_rf = -1
+jobs_rf = 24
+
+
 
 for index in range(0, len(Modalities)):
 
@@ -93,7 +97,7 @@ for index in range(0, len(Modalities)):
 
     # Set the model conditions, run the model
     grid = GridSearchCV(estimator=RandomForestClassifier(random_state=Random_State), param_grid=grid_params_rf,
-                        scoring='roc_auc', cv=grid_cv_rf, n_jobs=jobs_rf, verbose=5)
+                        scoring='f1', cv=grid_cv_rf, n_jobs=jobs_rf, verbose=1)
 
     #grid.fit(X_train, np.ravel(y_train_modality))
     grid.fit(X_train_smote, np.ravel(y_train_modality_smote))
@@ -134,8 +138,6 @@ for index in range(0, len(Modalities)):
     plt.title("Random Forest " +str(Modality) + " ROC Curve")
     plt.legend(loc="lower right")
     plt.show()
-
-# ----------------------------------------------------------------------------------------------------------------------
 """
 
 # Logistic Regression
@@ -143,18 +145,18 @@ for index in range(0, len(Modalities)):
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logistic_Regression')
 
 # Set all the variables
-C = [0.01]
+C = [0.1]
 solver = ["saga"]
 multi_class = ["multinomial"]
 max_iter = [300]
 
-grid_params_lr = {'C': C,
-                  'solver': solver,
-                  'multi_class': multi_class,
-                  'max_iter': max_iter}
+grid_params_lr = {'C': [0.01],
+                  'solver': ["saga"],
+                  'multi_class': ["multinomial"],
+                  'max_iter':  [1000]}
 
 grid_cv_lr = 3
-jobs_lr = -1
+jobs_lr = 24
 
 LR_weights = pd.DataFrame(pd.Series(X.columns),columns=['Columns'])
 
@@ -219,8 +221,10 @@ for index in range(0, len(Modalities)):
     plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.title("Logistic Regression "str(Modality) + " ROC Curve")
+    plt.title("Logistic Regression " + str(Modality) + " ROC Curve")
     plt.legend(loc="lower right")
     plt.show()
 
-"""
+LR_weights.shape
+
+grid.best_estimator_.intercept_
