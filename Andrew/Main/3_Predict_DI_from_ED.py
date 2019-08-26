@@ -42,9 +42,10 @@ Random_State = 42
 ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
 
 # remove some columns that don't seem to be adding anything
-ML_Clean = ML_Clean[ML_Clean.columns.drop(list(ML_Clean.filter(regex='Province|Arrived_|Method')))]
+ML_Clean = ML_Clean[ML_Clean.columns.drop(list(ML_Clean.filter(regex='Province|Arrived_|Method|Day_of_Arrival')))]
 
-ML_Clean = ML_Clean.drop(['Age at Visit in days', 'Pulse Formatted', 'Resp Formatted', 'Temp Formatted','Gender_U',],axis=1)
+ML_Clean = ML_Clean.drop(['Age at Visit in days', 'Pulse Formatted', 'Resp Formatted', 'Temp Formatted',
+                          'Gender_U', 'Encounter Number', 'Visits Since Aug 2018', 'Last Weight formatted'],axis=1)
 
 """
 ## Model based learning for additional data removing
@@ -202,9 +203,7 @@ for index in range(0, len(Modalities)):
     print("Best Roc Auc Score: " + str(grid.best_score_))
     print("Best Parameters: " + str(grid.best_params_))
 
-
     LR_weights[str(Modality)] = pd.Series((grid.best_estimator_.coef_)[0,:])
-
 
     # Predict on Test Data
     pred_binary = grid.predict(X_test)
