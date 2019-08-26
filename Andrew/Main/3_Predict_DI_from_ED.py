@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 from imblearn.over_sampling import SMOTE
 from collections import Counter
@@ -39,6 +40,22 @@ Random_State = 42
 # Prep data splits
 # Import data
 ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
+
+# remove some columns that don't seem to be adding anything
+ML_Clean = ML_Clean[ML_Clean.columns.drop(list(ML_Clean.filter(regex='Province|Arrived_|Method')))]
+
+ML_Clean = ML_Clean.drop(['Age at Visit in days', 'Pulse Formatted', 'Resp Formatted', 'Temp Formatted','Gender_U',],axis=1)
+
+"""
+## Model based learning for additional data removing
+# corr matrix
+corr = ML_Clean.iloc[:,1:20].corr()
+sns.heatmap(corr)
+plt.show()
+"""
+
+#-------------------------------------------------------------------------------------------------------------
+#General pre modeling
 
 # Split data for modeling
 Modalities = ['X-Ray', 'US', 'MRI', 'CT']
@@ -67,13 +84,13 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Rand
 # set params
 grid_params_rf = [{'bootstrap': [True],
                    'criterion': ['entropy'],
-                   'max_depth': [50],
+                   'max_depth': [None,50],
                    'max_features': ['sqrt'],
-                   'min_samples_leaf': [50],
+                   'min_samples_leaf': [5],
                    'min_samples_split': [5],
                    'n_estimators': [1000]
                    }]
-grid_cv_rf = 10
+grid_cv_rf = 5
 jobs_rf = 24
 
 
@@ -97,7 +114,7 @@ for index in range(0, len(Modalities)):
 
     # Set the model conditions, run the model
     grid = GridSearchCV(estimator=RandomForestClassifier(random_state=Random_State), param_grid=grid_params_rf,
-                        scoring='f1', cv=grid_cv_rf, n_jobs=jobs_rf, verbose=1)
+                        scoring='recall', cv=grid_cv_rf, n_jobs=jobs_rf, verbose=1)
 
     #grid.fit(X_train, np.ravel(y_train_modality))
     grid.fit(X_train_smote, np.ravel(y_train_modality_smote))
@@ -145,12 +162,8 @@ for index in range(0, len(Modalities)):
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logistic_Regression')
 
 # Set all the variables
-C = [0.1]
-solver = ["saga"]
-multi_class = ["multinomial"]
-max_iter = [300]
 
-grid_params_lr = {'C': [0.01],
+grid_params_lr = {'C': [0.1],
                   'solver': ["saga"],
                   'multi_class': ["multinomial"],
                   'max_iter':  [1000]}
@@ -182,13 +195,13 @@ for index in range(0, len(Modalities)):
     grid = GridSearchCV(estimator=LogisticRegression(random_state=Random_State), param_grid=grid_params_lr,
                         scoring='roc_auc', cv=grid_cv_lr, n_jobs=jobs_lr, verbose=1)
 
-    grid.fit(X_train, np.ravel(y_train_modality))
+    grid.fit(X_train_smote, np.ravel(y_train_modality_smote))
 
     # Evaluate training results
     print("*********** Training Results ***********")
     print("Best Roc Auc Score: " + str(grid.best_score_))
     print("Best Parameters: " + str(grid.best_params_))
-    print("Coefficients:")
+
 
     LR_weights[str(Modality)] = pd.Series((grid.best_estimator_.coef_)[0,:])
 
@@ -225,6 +238,5 @@ for index in range(0, len(Modalities)):
     plt.legend(loc="lower right")
     plt.show()
 
-LR_weights.shape
 
-grid.best_estimator_.intercept_
+
