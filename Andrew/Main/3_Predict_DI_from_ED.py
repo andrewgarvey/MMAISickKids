@@ -60,7 +60,7 @@ plt.show()
 #General pre modeling
 
 # Split data for modeling
-Modalities = ['X-Ray', 'US', 'MRI', 'CT', 'Any']
+Modalities = ['Any','X-Ray', 'US', 'MRI', 'CT']
 
 X = ML_Clean.drop(Modalities, axis=1)
 y = ML_Clean[Modalities]
