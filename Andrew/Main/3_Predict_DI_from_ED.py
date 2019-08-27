@@ -90,10 +90,10 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logi
 grid_params_lr = {'C': [0.1, 0.01, 0.001, 0.0001],
                   'solver': ['liblinear', "saga"],
                   'multi_class': ['ovr','auto'],
-                  'max_iter':  [2000]}
+                  'max_iter':  [3000]}
 
-grid_cv_lr = 10
-jobs_lr = 32
+grid_cv_lr = 2
+jobs_lr = 20
 
 LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
 
@@ -104,10 +104,6 @@ LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
 for modality_index in range(0, len(Modalities)):
     for age_index in range(0, len(Ages)):
         for gender_index in range(0, len(Genders)):
-
-            modality_index = 0
-            age_index = 0
-            gender_index =0
 
             # get the Modalities/Age/Gender name for this loop
             modality = Modalities[modality_index]
@@ -176,7 +172,7 @@ for modality_index in range(0, len(Modalities)):
             plt.ylim([0.0, 1.05])
             plt.xlabel('False Positive Rate')
             plt.ylabel('True Positive Rate')
-            plt.title("Logistic Regression " + str(Modality) + " ROC Curve")
+            plt.title("Logistic Regression " + str(modality)+" "+str(age)+" "+str(gender) + " ROC Curve")
             plt.legend(loc="lower right")
             plt.show()
 
