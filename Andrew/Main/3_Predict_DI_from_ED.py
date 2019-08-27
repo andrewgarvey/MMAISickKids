@@ -29,10 +29,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import accuracy_score, confusion_matrix, auc, roc_auc_score, roc_curve,  classification_report
-#from sklearn.preprocessing import StandardScaler
 
-import sklearn
-sorted(sklearn.metrics.SCORERS.keys())
 # set seed
 Random_State = 42
 
@@ -44,7 +41,7 @@ ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outp
 # remove some columns that don't seem to be adding anything
 ML_Clean = ML_Clean[ML_Clean.columns.drop(list(ML_Clean.filter(regex='Province|Arrived_|Method|Day_of_Arrival')))]
 
-ML_Clean = ML_Clean.drop(['Age at Visit in days', 'Pulse Formatted', 'Resp Formatted', 'Temp Formatted',
+ML_Clean = ML_Clean.drop(['Pulse Formatted', 'Resp Formatted', 'Temp Formatted',
                           'Gender_U', 'Encounter Number', 'Visits Since Aug 2018',
                           'Gender_F', 'Last Weight formatted'],axis=1)
 
@@ -60,12 +57,19 @@ plt.show()
 #General pre modeling
 
 # Split data for modeling
-Modalities = ['Any','X-Ray', 'US', 'MRI', 'CT']
+Modalities = ['Any', 'X-Ray', 'US', 'MRI', 'CT']
+Ages = ['<1yr', '1-5yr', '6-10yr', '>10yr']
+Genders = ['F', 'M']
 
+# grouping for age specific data, 1 year / 5 year / 10 year/ rest
+Age_Grouping = pd.cut(ML_Clean['Age at Visit in days'],bins=(-100, 365, 5*365, 10*365, 100*365), labels=Ages)
+
+# grouping for gender specific data
+Gender_Grouping = pd.cut(ML_Clean['Gender_M'], bins=(-1, 0.5, 2), labels=Genders)
+
+# Set up total environment for tests
 X = ML_Clean.drop(Modalities, axis=1)
 y = ML_Clean[Modalities]
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=Random_State)
 
 # smote set up
 sm=SMOTE(random_state=Random_State)
@@ -86,76 +90,133 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logi
 grid_params_lr = {'C': [0.1, 0.01, 0.001, 0.0001],
                   'solver': ['liblinear', "saga"],
                   'multi_class': ['ovr','auto'],
-                  'max_iter':  [5000]}
+                  'max_iter':  [2000]}
 
 grid_cv_lr = 10
-jobs_lr = 24
+jobs_lr = 32
 
 LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
 
+# Something to store results
+# LR_Metrics , includes: splits (Age Group, Gender, total dataset size)
+#                        Metrics (ROC_AUC, Classification Metric)
 
-for index in range(0, len(Modalities)):
+for modality_index in range(0, len(Modalities)):
+    for age_index in range(0, len(Ages)):
+        for gender_index in range(0, len(Genders)):
 
-    # get the Modalities name for this loop
-    Modality = Modalities[index]
+            modality_index = 0
+            age_index = 0
+            gender_index =0
 
-    print("\n \n \n *********** Modality: " + Modality + " ***********")
+            # get the Modalities/Age/Gender name for this loop
+            modality = Modalities[modality_index]
+            age = Ages[age_index]
+            gender = Genders[gender_index]
 
-    # set the y train with the target variable
-    y_train_modality = y_train.iloc[:, y_train.columns == Modality].values.reshape(-1, )
+            # use index to filter to specific X and y
+            age_gender_index = (Age_Grouping == age) & (Gender_Grouping == gender)
 
-    # original balance
-    print('Pre-Smote: '+ str(Counter(y_train_modality)))
+            X_selected = X.loc[age_gender_index, :]
+            y_selected = y.loc[age_gender_index, :]
+
+            # Split train/test
+            X_train, X_test, y_train, y_test = train_test_split(X_selected, y_selected, test_size=0.25, random_state=Random_State)
+
+            print("\n \n \n ***********" + str(modality)+" "+str(age)+" "+str(gender) + " ***********")
+
+            # set the y train with the target variable
+            y_train_modality = y_train.iloc[:, y_train.columns == modality].values.reshape(-1, )
+
+            # original balance
+            print('Pre-Smote: '+ str(Counter(y_train_modality)))
+
+            #smote and new balance
+            X_train_smote, y_train_modality_smote = sm.fit_resample(X_train, y_train_modality)
+            print('Post-Smote: ' + str(Counter(y_train_modality_smote)))
+
+            # Set the model conditions, run the model
+            grid = GridSearchCV(estimator=LogisticRegression(random_state=Random_State), param_grid=grid_params_lr,
+                                scoring='roc_auc', cv=grid_cv_lr, n_jobs=jobs_lr, verbose=1)
+
+            grid.fit(X_train_smote, np.ravel(y_train_modality_smote))
+
+            # Evaluate training results
+            print("*********** Training Results ***********")
+            print("Best Roc Auc Score: " + str(grid.best_score_))
+            print("Best Parameters: " + str(grid.best_params_))
+
+            LR_weights[str(modality)+" "+str(age)+" "+str(gender)] = pd.Series((grid.best_estimator_.coef_)[0,:])
+
+            # Predict on Test Data
+            pred_binary = grid.predict(X_test)
+            pred = grid.predict_proba(X_test)
+            pred_proba = pred[:, 1]
+            y_test_modality = y_test.iloc[:, y_test.columns == modality].values.reshape(-1, )
+
+            # Evaluate Testing Results
+            # binary
+            print("*********** Binary Test Results ***********")
+            print("Confusion Matrix: \n" + str(confusion_matrix(y_test_modality, pred_binary)))
+            print("Classification Report:  \n" + str(classification_report(y_test_modality, pred_binary)))
+            print("Accuracy: " + str(accuracy_score(y_test_modality, pred_binary)))
+
+            # probabilistic
+            print("*********** Probabilistic Test Results ***********")
+            print("ROC AUC Score: \n" + str(roc_auc_score(y_test_modality, pred_proba)))
+
+            # Auc Graph
+            fpr, tpr, thresholds = roc_curve(y_test_modality, pred_proba)
+            roc_auc = auc(fpr, tpr)
+
+            plt.figure()
+            plt.plot(fpr, tpr, color='darkorange',  label='ROC curve (area = %0.2f)' % roc_auc)  # roc
+            plt.plot([0, 1], [0, 1], color='navy',  linestyle='--')  # baseline
+            plt.xlim([0.0, 1.0])
+            plt.ylim([0.0, 1.05])
+            plt.xlabel('False Positive Rate')
+            plt.ylabel('True Positive Rate')
+            plt.title("Logistic Regression " + str(Modality) + " ROC Curve")
+            plt.legend(loc="lower right")
+            plt.show()
 
 
-    #smote and new balance
-    X_train_smote, y_train_modality_smote = sm.fit_resample(X_train, y_train_modality)
-    print('Post-Smote: ' + str(Counter(y_train_modality_smote)))
-    
-    # Set the model conditions, run the model
-    grid = GridSearchCV(estimator=LogisticRegression(random_state=Random_State), param_grid=grid_params_lr,
-                        scoring='f1', cv=grid_cv_lr, n_jobs=jobs_lr, verbose=1)
 
-    grid.fit(X_train_smote, np.ravel(y_train_modality_smote))
 
-    # Evaluate training results
-    print("*********** Training Results ***********")
-    print("Best Roc Auc Score: " + str(grid.best_score_))
-    print("Best Parameters: " + str(grid.best_params_))
 
-    LR_weights[str(Modality)] = pd.Series((grid.best_estimator_.coef_)[0,:])
 
-    # Predict on Test Data
-    pred_binary = grid.predict(X_test)
-    pred = grid.predict_proba(X_test)
-    pred_proba = pred[:, 1]
-    y_test_modality = y_test.iloc[:, y_test.columns == Modality].values.reshape(-1, )
 
-    # Evaluate Testing Results
-    # binary
-    print("*********** Binary Test Results ***********")
-    print("Confusion Matrix: \n" + str(confusion_matrix(y_test_modality, pred_binary)))
-    print("Classification Report:  \n" + str(classification_report(y_test_modality, pred_binary)))
-    print("Accuracy: " + str(accuracy_score(y_test_modality, pred_binary)))
 
-    # probabilistic
-    print("*********** Probabilistic Test Results ***********")
-    print("ROC AUC Score: \n" + str(roc_auc_score(y_test_modality, pred_proba)))
 
-    # Auc Graph
-    fpr, tpr, thresholds = roc_curve(y_test_modality, pred_proba)
-    roc_auc = auc(fpr, tpr)
 
-    plt.figure()
-    plt.plot(fpr, tpr, color='darkorange',  label='ROC curve (area = %0.2f)' % roc_auc)  # roc
-    plt.plot([0, 1], [0, 1], color='navy',  linestyle='--')  # baseline
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title("Logistic Regression " + str(Modality) + " ROC Curve")
-    plt.legend(loc="lower right")
-    plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 """
@@ -171,10 +232,10 @@ grid_params_rf = [{'bootstrap': [True],
                    'max_features': ['sqrt'],
                    'min_samples_leaf': [5, 15, 50],
                    'min_samples_split': [5],
-                   'n_estimators': [2000]
+                   'n_estimators': [100]
                    }]
 grid_cv_rf = 10
-jobs_rf = 24
+jobs_rf = 32
 
 
 
@@ -239,4 +300,3 @@ for index in range(0, len(Modalities)):
     plt.legend(loc="lower right")
     plt.show()
 """
-
