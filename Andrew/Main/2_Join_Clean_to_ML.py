@@ -58,7 +58,7 @@ All_Clean_Reduced = All_Clean.drop(['ED Completed Length of Stay (Minutes)', 'Ro
                                     'Order to Protocolled (min)', 'Protocolled to Begin (min)', 'Order to Begin (min)',
                                     'Begin to End (min)', 'End to Prelim (min)', 'End to Sign (min)',
                                     'Order to End (min)', 'Order to Sign (min)', 'Protocolling Instant', 'Procedure id',
-                                    'Authorizing Provider id', 'Finalizing Physician id', 'Arrived to Roomed' ], axis=1)
+                                    'Authorizing Provider id', 'Finalizing Physician id', 'Arrived to Roomed','ED Complaint' ], axis=1)
 
 # drop second mrn column
 di_mrn = len(All_Clean_Reduced.columns) -2 #  second last column is dupe mrn
@@ -117,27 +117,6 @@ for x in cc_list:
     All_Clean_Condensed[x] = All_Clean_Condensed['CC'].str.contains(x)
 
 # ----------------------------------------------------------------------------------------------------------------------
-# tad bit of nlp
-
-
-# Drop some punctuation
-All_Clean_Condensed['ED Complaint'] = All_Clean_Condensed['ED Complaint'].str.replace('/|,|.','',regex=False)
-
-no_features = 1000
-cv = CountVectorizer(max_features = no_features)
-#cv = CountVectorizer(min_df=0.01, max_features=no_features, ngram_range=[1,3])
-
-# matrix of features
-ED_Complaint_matrix = cv.fit_transform(All_Clean_Condensed['ED Complaint']).toarray()
-
-# bag of words
-data_bow = pd.DataFrame(list(map(np.ravel, ED_Complaint_matrix)))
-
-# join this version of description with everything except description
-All_Clean_Condensed = All_Clean_Condensed.drop('ED Complaint', axis=1)
-All_Clean_Condensed = All_Clean_Condensed.join(data_bow)
-
-# ----------------------------------------------------------------------------------------------------------------------
 """
 Notable Categories for prediction
 10 = X-Ray
@@ -151,6 +130,8 @@ All_Clean_Condensed['X-Ray'] = (All_Clean_Condensed['Category id'].str.contains(
 All_Clean_Condensed['US'] = (All_Clean_Condensed['Category id'].str.contains('9.0'))
 All_Clean_Condensed['MRI'] = (All_Clean_Condensed['Category id'].str.contains('7.0'))
 All_Clean_Condensed['CT'] = (All_Clean_Condensed['Category id'].str.contains('2.0'))
+All_Clean_Condensed['Any'] = (All_Clean_Condensed['Category id'].str.contains(r'\d')) #any test of any kind
+
 
 # Remove columns if no longer needed for whatever reason
 All_Clean_Dropped = All_Clean_Condensed.drop(['CSN', 'Arrival Method', 'CC', 'Postal Code',

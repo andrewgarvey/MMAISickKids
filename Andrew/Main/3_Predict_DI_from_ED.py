@@ -60,7 +60,7 @@ plt.show()
 #General pre modeling
 
 # Split data for modeling
-Modalities = ['X-Ray', 'US', 'MRI', 'CT']
+Modalities = ['X-Ray', 'US', 'MRI', 'CT', 'Any']
 
 X = ML_Clean.drop(Modalities, axis=1)
 y = ML_Clean[Modalities]
@@ -114,7 +114,7 @@ for index in range(0, len(Modalities)):
     
     # Set the model conditions, run the model
     grid = GridSearchCV(estimator=LogisticRegression(random_state=Random_State), param_grid=grid_params_lr,
-                        scoring='roc_auc', cv=grid_cv_lr, n_jobs=jobs_lr, verbose=1)
+                        scoring='f1', cv=grid_cv_lr, n_jobs=jobs_lr, verbose=1)
 
     grid.fit(X_train_smote, np.ravel(y_train_modality_smote))
 
