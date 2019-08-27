@@ -109,12 +109,23 @@ All_Clean_Condensed['Method_Car'] = (All_Clean_Condensed['Arrival Method'].str.c
 CC_Options = All_Clean_Condensed.groupby('CC').count().sort_values('CSN',ascending = False)
 CC_Options = CC_Options.loc[CC_Options['CSN']>15]
 
-# capture each index option that has more than 500 people
+# capture each index option that has more than 15 instances
 cc_list =  CC_Options.index.values.astype(str)
 
 # do a regex check for each of those columns
 for x in cc_list:
     All_Clean_Condensed[x] = All_Clean_Condensed['CC'].str.contains(x)
+
+## Complaint simplified Greatly, find big key words,
+Complaint_Options = All_Clean_Condensed.groupby('ED Complaint').count().sort_values('CSN',ascending = False)
+Complaint_Options = Complaint_Options.loc[Complaint_Options['CSN']>15]
+
+# capture each index option that has more than 500 people
+Complaint_list =  Complaint_Options.index.values.astype(str)
+
+# do a regex check for each of those columns
+for x in Complaint_list:
+    All_Clean_Condensed[x] = All_Clean_Condensed['ED Complaint'].str.contains(x)
 
 """
 Notable Categories for prediction

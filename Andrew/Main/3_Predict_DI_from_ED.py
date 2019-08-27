@@ -46,7 +46,7 @@ ML_Clean = ML_Clean[ML_Clean.columns.drop(list(ML_Clean.filter(regex='Province|A
 
 ML_Clean = ML_Clean.drop(['Age at Visit in days', 'Pulse Formatted', 'Resp Formatted', 'Temp Formatted',
                           'Gender_U', 'Encounter Number', 'Visits Since Aug 2018',
-                          'Gender_F', 'Last Weight formatted'],axis=1)
+                          'Gender_F', 'Last Weight formatted','ED Complaint'],axis=1)
 
 """
 ## Model based learning for additional data removing
@@ -77,7 +77,7 @@ X_train = scale.fit_transform(X_train)
 X_test = scale.fit_transform(X_test)
 """
 # ----------------------------------------------------------------------------------------------------------------------
-
+"""
 # Basic Random Forest
 # Set initial directory
 
@@ -157,7 +157,7 @@ for index in range(0, len(Modalities)):
     plt.title("Random Forest " +str(Modality) + " ROC Curve")
     plt.legend(loc="lower right")
     plt.show()
-
+"""
 
 # Logistic Regression
 # Set initial directory
