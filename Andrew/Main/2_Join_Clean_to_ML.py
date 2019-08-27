@@ -23,7 +23,7 @@ import matplotlib as mpl
 import datetime as dt
 import os
 from pandasql import sqldf
-
+from sklearn.feature_extraction.text import CountVectorizer
 
 #Set dir
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/')
@@ -116,17 +116,28 @@ cc_list =  CC_Options.index.values.astype(str)
 for x in cc_list:
     All_Clean_Condensed[x] = All_Clean_Condensed['CC'].str.contains(x)
 
-## Complaint simplified Greatly, find big key words,
-Complaint_Options = All_Clean_Condensed.groupby('ED Complaint').count().sort_values('CSN',ascending = False)
-Complaint_Options = Complaint_Options.loc[Complaint_Options['CSN']>15]
+# ----------------------------------------------------------------------------------------------------------------------
+# tad bit of nlp
 
-# capture each index option that has more than 500 people
-Complaint_list =  Complaint_Options.index.values.astype(str)
 
-# do a regex check for each of those columns
-for x in Complaint_list:
-    All_Clean_Condensed[x] = All_Clean_Condensed['ED Complaint'].str.contains(x)
+# Drop some punctuation
+All_Clean_Condensed['ED Complaint'] = All_Clean_Condensed['ED Complaint'].str.replace('/|,|.','',regex=False)
 
+no_features = 1000
+cv = CountVectorizer(max_features = no_features)
+#cv = CountVectorizer(min_df=0.01, max_features=no_features, ngram_range=[1,3])
+
+# matrix of features
+ED_Complaint_matrix = cv.fit_transform(All_Clean_Condensed['ED Complaint']).toarray()
+
+# bag of words
+data_bow = pd.DataFrame(list(map(np.ravel, ED_Complaint_matrix)))
+
+# join this version of description with everything except description
+All_Clean_Condensed = All_Clean_Condensed.drop('ED Complaint', axis=1)
+All_Clean_Condensed = All_Clean_Condensed.join(data_bow)
+
+# ----------------------------------------------------------------------------------------------------------------------
 """
 Notable Categories for prediction
 10 = X-Ray

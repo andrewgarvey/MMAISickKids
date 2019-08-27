@@ -46,7 +46,7 @@ ML_Clean = ML_Clean[ML_Clean.columns.drop(list(ML_Clean.filter(regex='Province|A
 
 ML_Clean = ML_Clean.drop(['Age at Visit in days', 'Pulse Formatted', 'Resp Formatted', 'Temp Formatted',
                           'Gender_U', 'Encounter Number', 'Visits Since Aug 2018',
-                          'Gender_F', 'Last Weight formatted','ED Complaint'],axis=1)
+                          'Gender_F', 'Last Weight formatted'],axis=1)
 
 """
 ## Model based learning for additional data removing
@@ -76,6 +76,87 @@ scale = StandardScaler()
 X_train = scale.fit_transform(X_train)
 X_test = scale.fit_transform(X_test)
 """
+# ----------------------------------------------------------------------------------------------------------------------
+# Logistic Regression
+# Set initial directory
+os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logistic_Regression')
+
+# Set all the variables
+
+grid_params_lr = {'C': [0.1, 0.01, 0.001, 0.0001],
+                  'solver': ['liblinear', "saga"],
+                  'multi_class': ['ovr','auto'],
+                  'max_iter':  [5000]}
+
+grid_cv_lr = 10
+jobs_lr = 24
+
+LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
+
+
+for index in range(0, len(Modalities)):
+
+    # get the Modalities name for this loop
+    Modality = Modalities[index]
+
+    print("\n \n \n *********** Modality: " + Modality + " ***********")
+
+    # set the y train with the target variable
+    y_train_modality = y_train.iloc[:, y_train.columns == Modality].values.reshape(-1, )
+
+    # original balance
+    print('Pre-Smote: '+ str(Counter(y_train_modality)))
+
+
+    #smote and new balance
+    X_train_smote, y_train_modality_smote = sm.fit_resample(X_train, y_train_modality)
+    print('Post-Smote: ' + str(Counter(y_train_modality_smote)))
+    
+    # Set the model conditions, run the model
+    grid = GridSearchCV(estimator=LogisticRegression(random_state=Random_State), param_grid=grid_params_lr,
+                        scoring='roc_auc', cv=grid_cv_lr, n_jobs=jobs_lr, verbose=1)
+
+    grid.fit(X_train_smote, np.ravel(y_train_modality_smote))
+
+    # Evaluate training results
+    print("*********** Training Results ***********")
+    print("Best Roc Auc Score: " + str(grid.best_score_))
+    print("Best Parameters: " + str(grid.best_params_))
+
+    LR_weights[str(Modality)] = pd.Series((grid.best_estimator_.coef_)[0,:])
+
+    # Predict on Test Data
+    pred_binary = grid.predict(X_test)
+    pred = grid.predict_proba(X_test)
+    pred_proba = pred[:, 1]
+    y_test_modality = y_test.iloc[:, y_test.columns == Modality].values.reshape(-1, )
+
+    # Evaluate Testing Results
+    # binary
+    print("*********** Binary Test Results ***********")
+    print("Confusion Matrix: \n" + str(confusion_matrix(y_test_modality, pred_binary)))
+    print("Classification Report:  \n" + str(classification_report(y_test_modality, pred_binary)))
+    print("Accuracy: " + str(accuracy_score(y_test_modality, pred_binary)))
+
+    # probabilistic
+    print("*********** Probabilistic Test Results ***********")
+    print("ROC AUC Score: \n" + str(roc_auc_score(y_test_modality, pred_proba)))
+
+    # Auc Graph
+    fpr, tpr, thresholds = roc_curve(y_test_modality, pred_proba)
+    roc_auc = auc(fpr, tpr)
+
+    plt.figure()
+    plt.plot(fpr, tpr, color='darkorange',  label='ROC curve (area = %0.2f)' % roc_auc)  # roc
+    plt.plot([0, 1], [0, 1], color='navy',  linestyle='--')  # baseline
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title("Logistic Regression " + str(Modality) + " ROC Curve")
+    plt.legend(loc="lower right")
+    plt.show()
+
 # ----------------------------------------------------------------------------------------------------------------------
 """
 # Basic Random Forest
@@ -158,85 +239,4 @@ for index in range(0, len(Modalities)):
     plt.legend(loc="lower right")
     plt.show()
 """
-
-# Logistic Regression
-# Set initial directory
-os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logistic_Regression')
-
-# Set all the variables
-
-grid_params_lr = {'C': [0.1, 0.01, 0.001, 0.0001],
-                  'solver': ['liblinear', "saga"],
-                  'multi_class': ['ovr','auto'],
-                  'max_iter':  [5000]}
-
-grid_cv_lr = 10
-jobs_lr = 24
-
-LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
-
-
-for index in range(0, len(Modalities)):
-
-    # get the Modalities name for this loop
-    Modality = Modalities[index]
-
-    print("\n \n \n *********** Modality: " + Modality + " ***********")
-
-    # set the y train with the target variable
-    y_train_modality = y_train.iloc[:, y_train.columns == Modality].values.reshape(-1, )
-
-    # original balance
-    print('Pre-Smote: '+ str(Counter(y_train_modality)))
-
-    #smote and new balance
-    X_train_smote, y_train_modality_smote = sm.fit_resample(X_train, y_train_modality)
-    print('Post-Smote: ' + str(Counter(y_train_modality_smote)))
-    
-    # Set the model conditions, run the model
-    grid = GridSearchCV(estimator=LogisticRegression(random_state=Random_State), param_grid=grid_params_lr,
-                        scoring='roc_auc', cv=grid_cv_lr, n_jobs=jobs_lr, verbose=1)
-
-    grid.fit(X_train_smote, np.ravel(y_train_modality_smote))
-
-    # Evaluate training results
-    print("*********** Training Results ***********")
-    print("Best Roc Auc Score: " + str(grid.best_score_))
-    print("Best Parameters: " + str(grid.best_params_))
-
-    LR_weights[str(Modality)] = pd.Series((grid.best_estimator_.coef_)[0,:])
-
-    # Predict on Test Data
-    pred_binary = grid.predict(X_test)
-    pred = grid.predict_proba(X_test)
-    pred_proba = pred[:, 1]
-    y_test_modality = y_test.iloc[:, y_test.columns == Modality].values.reshape(-1, )
-
-    # Evaluate Testing Results
-    # binary
-    print("*********** Binary Test Results ***********")
-    print("Confusion Matrix: \n" + str(confusion_matrix(y_test_modality, pred_binary)))
-    print("Classification Report:  \n" + str(classification_report(y_test_modality, pred_binary)))
-    print("Accuracy: " + str(accuracy_score(y_test_modality, pred_binary)))
-
-    # probabilistic
-    print("*********** Probabilistic Test Results ***********")
-    print("ROC AUC Score: \n" + str(roc_auc_score(y_test_modality, pred_proba)))
-
-    # Auc Graph
-    fpr, tpr, thresholds = roc_curve(y_test_modality, pred_proba)
-    roc_auc = auc(fpr, tpr)
-
-    plt.figure()
-    plt.plot(fpr, tpr, color='darkorange',  label='ROC curve (area = %0.2f)' % roc_auc)  # roc
-    plt.plot([0, 1], [0, 1], color='navy',  linestyle='--')  # baseline
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title("Logistic Regression " + str(Modality) + " ROC Curve")
-    plt.legend(loc="lower right")
-    plt.show()
-
-
 
