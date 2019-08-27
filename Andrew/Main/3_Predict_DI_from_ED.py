@@ -95,16 +95,22 @@ grid_params_lr = {'C': [0.1, 0.01, 0.001, 0.0001],
 grid_cv_lr = 2
 jobs_lr = 20
 
+# Something to store results
 LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
 
-# Something to store results
-# LR_Metrics , includes: splits (Age Group, Gender, total dataset size)
-#                        Metrics (ROC_AUC, Classification Metric)
+metrics = ['Modality', 'Age', 'Gender', 'DataSize', 'ROC_AUC', 'Accuracy', 'Confusion Matrix']
+LR_Metrics = pd.DataFrame(columns=metrics, index=range(0, len(Modalities)*len(Ages)*len(Genders)))
+
+
+rowID = 0
 
 for modality_index in range(0, len(Modalities)):
     for age_index in range(0, len(Ages)):
         for gender_index in range(0, len(Genders)):
 
+            modality_index = 0
+            age_index = 0
+            gender_index = 0
             # get the Modalities/Age/Gender name for this loop
             modality = Modalities[modality_index]
             age = Ages[age_index]
@@ -127,7 +133,7 @@ for modality_index in range(0, len(Modalities)):
             # original balance
             print('Pre-Smote: '+ str(Counter(y_train_modality)))
 
-            #smote and new balance
+            # smote and new balance
             X_train_smote, y_train_modality_smote = sm.fit_resample(X_train, y_train_modality)
             print('Post-Smote: ' + str(Counter(y_train_modality_smote)))
 
@@ -142,8 +148,7 @@ for modality_index in range(0, len(Modalities)):
             print("Best Roc Auc Score: " + str(grid.best_score_))
             print("Best Parameters: " + str(grid.best_params_))
 
-            LR_weights[str(modality)+" "+str(age)+" "+str(gender)] = pd.Series((grid.best_estimator_.coef_)[0,:])
-
+            # ----------------------------------------------------------------------------------------------------------
             # Predict on Test Data
             pred_binary = grid.predict(X_test)
             pred = grid.predict_proba(X_test)
@@ -176,43 +181,25 @@ for modality_index in range(0, len(Modalities)):
             plt.legend(loc="lower right")
             plt.show()
 
+            # ----------------------------------------------------------------------------------------------------------
+            # Store Weights
+            LR_weights[str(modality) + " " + str(age) + " " + str(gender)] = pd.Series(grid.best_estimator_.coef_[0, :])
 
+            # Store Metrics
 
+            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Modality'] = modality
+            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Age'] = age
+            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Gender'] = gender
+            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'DataSize'] = len(y_selected)
+            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'ROC_AUC'] = roc_auc_score(y_test_modality, pred_proba)
+            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Accuracy'] = accuracy_score(y_test_modality, pred_binary)
+            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Confusion Matrix'] = str(confusion_matrix(y_test_modality,
+                                                                                                    pred_binary))
 
+            # Increment Row for next loop
+            rowID = rowID+1
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+LR_Metrics_Backup = LR_Metrics
 
 # ----------------------------------------------------------------------------------------------------------------------
 """
@@ -231,7 +218,7 @@ grid_params_rf = [{'bootstrap': [True],
                    'n_estimators': [100]
                    }]
 grid_cv_rf = 10
-jobs_rf = 32
+jobs_rf = 20
 
 
 
