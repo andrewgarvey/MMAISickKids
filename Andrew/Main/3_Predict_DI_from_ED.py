@@ -45,7 +45,8 @@ ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outp
 ML_Clean = ML_Clean[ML_Clean.columns.drop(list(ML_Clean.filter(regex='Province|Arrived_|Method|Day_of_Arrival')))]
 
 ML_Clean = ML_Clean.drop(['Age at Visit in days', 'Pulse Formatted', 'Resp Formatted', 'Temp Formatted',
-                          'Gender_U', 'Encounter Number', 'Visits Since Aug 2018', 'Last Weight formatted'],axis=1)
+                          'Gender_U', 'Encounter Number', 'Visits Since Aug 2018',
+                          'Gender_F', 'Last Weight formatted'],axis=1)
 
 """
 ## Model based learning for additional data removing
@@ -76,7 +77,7 @@ X_train = scale.fit_transform(X_train)
 X_test = scale.fit_transform(X_test)
 """
 # ----------------------------------------------------------------------------------------------------------------------
-"""
+
 # Basic Random Forest
 # Set initial directory
 
@@ -85,13 +86,13 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Rand
 # set params
 grid_params_rf = [{'bootstrap': [True],
                    'criterion': ['entropy'],
-                   'max_depth': [None,50],
+                   'max_depth': [100, 50],
                    'max_features': ['sqrt'],
-                   'min_samples_leaf': [5],
+                   'min_samples_leaf': [5, 15, 50],
                    'min_samples_split': [5],
-                   'n_estimators': [1000]
+                   'n_estimators': [2000]
                    }]
-grid_cv_rf = 5
+grid_cv_rf = 10
 jobs_rf = 24
 
 
@@ -156,7 +157,7 @@ for index in range(0, len(Modalities)):
     plt.title("Random Forest " +str(Modality) + " ROC Curve")
     plt.legend(loc="lower right")
     plt.show()
-"""
+
 
 # Logistic Regression
 # Set initial directory
@@ -164,15 +165,15 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logi
 
 # Set all the variables
 
-grid_params_lr = {'C': [0.1],
-                  'solver': ["saga"],
-                  'multi_class': ["multinomial"],
-                  'max_iter':  [1000]}
+grid_params_lr = {'C': [0.1, 0.01, 0.001, 0.0001],
+                  'solver': ['liblinear', "saga"],
+                  'multi_class': ['ovr','auto'],
+                  'max_iter':  [5000]}
 
-grid_cv_lr = 3
+grid_cv_lr = 10
 jobs_lr = 24
 
-LR_weights = pd.DataFrame(pd.Series(X.columns),columns=['Columns'])
+LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
 
 
 for index in range(0, len(Modalities)):
@@ -190,7 +191,7 @@ for index in range(0, len(Modalities)):
 
     #smote and new balance
     X_train_smote, y_train_modality_smote = sm.fit_resample(X_train, y_train_modality)
-    print('Post-Smote: '+ str(Counter(y_train_modality_smote)))
+    print('Post-Smote: ' + str(Counter(y_train_modality_smote)))
     
     # Set the model conditions, run the model
     grid = GridSearchCV(estimator=LogisticRegression(random_state=Random_State), param_grid=grid_params_lr,

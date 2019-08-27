@@ -107,7 +107,7 @@ All_Clean_Condensed['Method_Car'] = (All_Clean_Condensed['Arrival Method'].str.c
 
 ## CC simplified Greatly, find big key words,
 CC_Options = All_Clean_Condensed.groupby('CC').count().sort_values('CSN',ascending = False)
-CC_Options = CC_Options.loc[CC_Options['CSN']>500]
+CC_Options = CC_Options.loc[CC_Options['CSN']>15]
 
 # capture each index option that has more than 500 people
 cc_list =  CC_Options.index.values.astype(str)
@@ -152,3 +152,4 @@ All_Clean_Dropped.isna().sum()
 # Write it to csv for easy reference
 All_Clean_Dropped.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv', index = None, header=True)
 # -----------------------------------------------------------------------------------------------------------------------
+print("done 2")

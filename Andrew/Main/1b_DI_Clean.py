@@ -91,3 +91,4 @@ di_data = di_data.drop(['Category', 'Procedure', 'Authorizing Provider', 'Name']
 
 di_data.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/DI_Clean.csv', index = None, header=True)
 
+print("done 1b")

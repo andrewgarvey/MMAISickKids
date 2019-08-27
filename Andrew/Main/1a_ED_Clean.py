@@ -82,7 +82,7 @@ ED_Full.columns
 ED_Full.isna().sum()
 
 # Remove entirely useless columns, recall purpose is to 'predict demand as function of month/day' and 'predict DI'
-ED_Reduced = ED_Full.drop(['Registration Number','Pref Language','Acuity','Care Area','ED Complaint',
+ED_Reduced = ED_Full.drop(['Registration Number','Pref Language','Acuity','Care Area',
                            'Diagnosis','First ED Provider','Last ED Provider','ED Longest Attending ED Provider',
                            'Treatment Team','Last Attending Provider','Discharge-Admit Time','Door to PIA',
                            'ED PIA Threshold', 'ED Completed Length of Stay (Hours)','LOS','ED LWBS','Arrival to Room',
@@ -240,3 +240,4 @@ ED_Clean.dtypes # looks fine
 # write that to csv for usage later
 ED_Clean.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ED_Clean.csv', index = None, header=True)
 
+print("done 1a")
