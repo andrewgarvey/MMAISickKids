@@ -183,12 +183,13 @@ Info_Gain.to_csv('Info_Gain_Matrix.csv')
 
 # Determine a threshold and drop ones that don't meet it
 Info_Gain['max'] = Info_Gain.max(axis=1)
-keep_index = np.array(Info_Gain['max'] > 0.0005)  # helpful somewhere
+keep_index = np.array(Info_Gain['max'] > 0.0005)  # helpful somewhere, many are straight 0s
 
 All_Clean_final = All_Clean_Dropped.loc[:, keep_index]
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Remove some which have high dependancies/correlations, mostly caused by dummy variables
+# Remove some which have high dependencies/correlations, mostly caused by dummy variables
+
 # corr matrix
 corr = All_Clean_Dropped.corr()
 sns.heatmap(corr)
@@ -196,9 +197,7 @@ plt.savefig("Corr Matrix.pdf")
 
 # Remove them
 All_Clean_final = All_Clean_final[All_Clean_final.columns.drop(list(All_Clean_final.filter(regex='Province|Arrived_|Method|Day_of_Arrival')))]
-
-All_Clean_final = All_Clean_final.drop(['Gender_U', 'Encounter Number', 'Visits Since Aug 2018',
-                          'Gender_F', ], axis=1)
+All_Clean_final = All_Clean_final.drop(['Gender_U', 'Encounter Number', 'Visits Since Aug 2018','Gender_F' ], axis=1)
 
 
 # Write it to csv for easy reference
