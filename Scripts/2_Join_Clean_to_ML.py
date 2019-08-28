@@ -155,12 +155,18 @@ All_Clean_Dropped.isna().sum()
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Take structurally suitable data,  confirm its usefulness, drop columns if appropriate
+"""
+# scaling (omitted to retain readability, actual implemented model should consider it)
+scale = StandardScaler()
 
+X_train = scale.fit_transform(X_train)
+X_test = scale.fit_transform(X_test)
+"""
 # corr matrix
 corr = All_Clean_Dropped.corr()
 sns.heatmap(corr)
 plt.show()
-# Few of the dummy variables in particular can be removed ie: don't need both genders
+# result: few of the dummy variables in particular can be removed ie: don't need both genders
 
 # Information Gain
 
