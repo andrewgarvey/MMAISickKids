@@ -112,7 +112,7 @@ for modality_index in range(0, len(Modalities)):
             y_train_modality = y_train.iloc[:, y_train.columns == modality].values.reshape(-1, )
 
             # original balance
-            print('Pre-Smote: '+ str(Counter(y_train_modality)))
+            print('Pre-Smote: ' + str(Counter(y_train_modality)))
 
             # smote and new balance
             X_train_smote, y_train_modality_smote = sm.fit_resample(X_train, y_train_modality)
