@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 from imblearn.over_sampling import SMOTE
 from collections import Counter
@@ -37,21 +37,6 @@ Random_State = 42
 # Prep data splits
 # Import data
 ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
-
-# remove some columns that don't seem to be adding anything
-ML_Clean = ML_Clean[ML_Clean.columns.drop(list(ML_Clean.filter(regex='Province|Arrived_|Method|Day_of_Arrival')))]
-
-ML_Clean = ML_Clean.drop(['Pulse Formatted', 'Resp Formatted', 'Temp Formatted',
-                          'Gender_U', 'Encounter Number', 'Visits Since Aug 2018',
-                          'Gender_F', 'Last Weight formatted'],axis=1)
-
-"""
-## Model based learning for additional data removing
-# corr matrix
-corr = ML_Clean.iloc[:,1:20].corr()
-sns.heatmap(corr)
-plt.show()
-"""
 
 # Split data for modeling
 Modalities = ['Any', 'X-Ray', 'US', 'MRI', 'CT']
@@ -234,7 +219,6 @@ rowID = 0
 for modality_index in range(0, len(Modalities)):
     for age_index in range(0, len(Ages)):
         for gender_index in range(0, len(Genders)):
-
 
             # get the Modalities/Age/Gender name for this loop
             modality = Modalities[modality_index]

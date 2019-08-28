@@ -23,7 +23,8 @@ import matplotlib as mpl
 import datetime as dt
 import os
 from pandasql import sqldf
-from sklearn.feature_extraction.text import CountVectorizer
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 #Set dir
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/')
@@ -152,7 +153,32 @@ All_Clean_Dropped['Temp Formatted'] = pd.to_numeric(All_Clean_Dropped['Temp Form
 All_Clean_Dropped = All_Clean_Dropped.dropna()
 All_Clean_Dropped.isna().sum()
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Take structurally suitable data,  confirm its usefulness, drop columns if appropriate
+
+# corr matrix
+corr = All_Clean_Dropped.corr()
+sns.heatmap(corr)
+plt.show()
+# Few of the dummy variables in particular can be removed ie: don't need both genders
+
+# Information Gain
+
+
+## Model based learning for additional data removing
+
+
+# Dropping those columns
+
+All_Clean_Dropped = All_Clean_Dropped[All_Clean_Dropped.columns.drop(list(All_Clean_Dropped.filter(regex='Province|Arrived_|Method|Day_of_Arrival')))]
+
+All_Clean_Dropped = All_Clean_Dropped.drop(['Pulse Formatted', 'Resp Formatted', 'Temp Formatted',
+                          'Gender_U', 'Encounter Number', 'Visits Since Aug 2018',
+                          'Gender_F', 'Last Weight formatted'], axis=1)
+
+
 # Write it to csv for easy reference
 All_Clean_Dropped.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv', index = None, header=True)
 # -----------------------------------------------------------------------------------------------------------------------
+
 print("done 2")
