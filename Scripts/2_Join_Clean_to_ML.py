@@ -22,9 +22,11 @@ import pandas as pd
 import matplotlib as mpl
 import datetime as dt
 import os
+
 from pandasql import sqldf
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.feature_selection import mutual_info_classif
 
 #Set dir
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/')
@@ -138,7 +140,7 @@ All_Clean_Condensed['Any'] = (All_Clean_Condensed['Category id'].str.contains(r'
 All_Clean_Dropped = All_Clean_Condensed.drop(['CSN', 'Arrival Method', 'CC', 'Postal Code',
                                               'Province','Category id','Day of Arrival', 'Gender','Arrived' ], axis=1)
 # Confirm all the columns are in use-able format
-test = All_Clean_Dropped.dtypes
+# All_Clean_Dropped.dtypes
 
 # convert everything that is objects to floats or int
 
@@ -165,25 +167,39 @@ X_test = scale.fit_transform(X_test)
 # corr matrix
 corr = All_Clean_Dropped.corr()
 sns.heatmap(corr)
-plt.show()
+plt.savefig("Corr Matrix.pdf")
+
 # result: few of the dummy variables in particular can be removed ie: don't need both genders
 
-# Information Gain Statistics
+# Information Gain style statistics
+Modalities = ['Any', 'X-Ray', 'US', 'MRI', 'CT']
 
+X = All_Clean_Dropped.drop(Modalities, axis=1)
+y = All_Clean_Dropped[Modalities]
+
+Info_Gain = pd.DataFrame(pd.Series(All_Clean_Dropped.columns), columns=['Columns'])
+
+for index in range(0,len(Modalities)):
+    modality = Modalities[index]
+    y_mod = y.iloc[:,y.columns == modality]
+
+    gain = mutual_info_classif(X, y_mod, random_state=42)
+    Info_Gain[str(modality)] = pd.Series(gain)
+
+Info_Gain.to_csv('Info_Gain_Matrix.csv')
 
 # result:  again many of the dummy variables happen to add very very little
 
 # Dropping those columns
 
-All_Clean_Dropped = All_Clean_Dropped[All_Clean_Dropped.columns.drop(list(All_Clean_Dropped.filter(regex='Province|Arrived_|Method|Day_of_Arrival')))]
+All_Clean_final = All_Clean_Dropped[All_Clean_Dropped.columns.drop(list(All_Clean_Dropped.filter(regex='Province|Arrived_|Method|Day_of_Arrival')))]
 
-All_Clean_Dropped = All_Clean_Dropped.drop(['Pulse Formatted', 'Resp Formatted', 'Temp Formatted',
+All_Clean_final = All_Clean_final.drop(['Pulse Formatted', 'Resp Formatted', 'Temp Formatted',
                           'Gender_U', 'Encounter Number', 'Visits Since Aug 2018',
                           'Gender_F', 'Last Weight formatted'], axis=1)
 
-
 # Write it to csv for easy reference
-All_Clean_Dropped.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv', index = None, header=True)
+All_Clean_final.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv', index = None, header=True)
 # -----------------------------------------------------------------------------------------------------------------------
 
 print("done 2")
