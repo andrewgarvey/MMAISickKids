@@ -4,10 +4,9 @@ Partner: Sargon Morad
 Date: Aug 24, 2019
 Client: Hospital for Sick Children
 
-Title: Predict_DI_from_ED
-
 Purpose:
--   Make Model for each modality, Random Forest and Logistic Regression
+-   Random Forest Model for each modality
+-   Attempt version of different age/gender groupings
 """
 # clear user created variables
 for name in dir():
@@ -36,10 +35,6 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Rand
 
 # Import data
 ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
-
-# Set up total environment for model
-X = ML_Clean.drop(Modalities, axis=1)
-y = ML_Clean[Modalities]
 
 # set seed
 Random_State = 42
@@ -72,6 +67,10 @@ Genders = ['Any', 'F', 'M']
 Age_Grouping = pd.cut(ML_Clean['Age at Visit in days'],bins=(-10000, -1000, 365, 5*365, 10*365, 100*365), labels=Ages)
 Gender_Grouping = pd.cut(ML_Clean['Gender_M'], bins=(-20, -1, 0.5, 2), labels=Genders)
 
+# Set up data that can be split for model
+X = ML_Clean.drop(Modalities, axis=1)
+y = ML_Clean[Modalities]
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Storing Looped Results
 metrics = ['Modality', 'Age', 'Gender', 'DataSize', 'ROC_AUC', 'Accuracy', 'Confusion Matrix','Best Params']
@@ -80,51 +79,7 @@ RF_Metrics = pd.DataFrame(columns=metrics, index=range(0, len(Modalities)*len(Ag
 rowID = 0
 
 # ----------------------------------------------------------------------------------------------------------------------
-# PREP DATA FOR LOOPING  (yes that is a pun)
-# Import data
-ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
-
-# Split data for modeling
-Modalities = ['Any', 'X-Ray', 'US', 'MRI', 'CT']
-Ages = ['Any', 'Less1yr', '1-5yr', '6-10yr', 'Over10yr']
-Genders = ['Any', 'F', 'M']
-
-# grouping for age specific data, 1 year / 5 year / 10 year/ rest
-Age_Grouping = pd.cut(ML_Clean['Age at Visit in days'],bins=(-10000,-1000, 365, 5*365, 10*365, 100*365), labels=Ages)
-
-# grouping for gender specific data
-Gender_Grouping = pd.cut(ML_Clean['Gender_M'], bins=(-20,-1, 0.5, 2), labels=Genders)
-
-# Set up total environment for models
-X = ML_Clean.drop(Modalities, axis=1)
-y = ML_Clean[Modalities]
-
-# smote set up
-sm=SMOTE(random_state=Random_State)
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Random Forest
-# Set output directory
-os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Random_Forest')
-
-# set params
-grid_params_rf = [{'bootstrap': [True],
-                   'criterion': ['entropy'],
-                   'max_depth': [100, 50],
-                   'max_features': ['sqrt'],
-                   'min_samples_leaf': [5, 15, 50],
-                   'min_samples_split': [5, 15],
-                   'n_estimators': [100, 500]
-                   }]
-grid_cv_rf = 10
-jobs_rf = 20
-
-# Something to store results
-metrics = ['Modality', 'Age', 'Gender', 'DataSize', 'ROC_AUC', 'Accuracy', 'Confusion Matrix', 'Best Params']
-RF_Metrics = pd.DataFrame(columns=metrics, index=range(0, len(Modalities)*len(Ages)*len(Genders)))
-
-rowID = 0
-
+# Training Models
 
 for modality_index in range(0, len(Modalities)):
     for age_index in range(0, len(Ages)):

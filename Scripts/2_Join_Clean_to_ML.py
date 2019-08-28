@@ -168,11 +168,10 @@ sns.heatmap(corr)
 plt.show()
 # result: few of the dummy variables in particular can be removed ie: don't need both genders
 
-# Information Gain
+# Information Gain Statistics
 
 
-## Model based learning for additional data removing
-
+# result:  again many of the dummy variables happen to add very very little
 
 # Dropping those columns
 

@@ -4,10 +4,9 @@ Partner: Sargon Morad
 Date: Aug 24, 2019
 Client: Hospital for Sick Children
 
-Title: Predict_DI_from_ED
-
 Purpose:
--   Make Model for each modality, Random Forest and Logistic Regression
+-   Logistic Regression Model for each modality
+-   Attempt version of different age/gender groupings
 """
 # clear user created variables
 for name in dir():
@@ -38,10 +37,6 @@ os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logi
 # Import data
 ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
 
-# Set up total environment for model
-X = ML_Clean.drop(Modalities, axis=1)
-y = ML_Clean[Modalities]
-
 # set seed
 Random_State = 42
 
@@ -69,6 +64,10 @@ Genders = ['Any', 'F', 'M']
 Age_Grouping = pd.cut(ML_Clean['Age at Visit in days'],bins=(-10000, -1000, 365, 5*365, 10*365, 100*365), labels=Ages)
 Gender_Grouping = pd.cut(ML_Clean['Gender_M'], bins=(-20, -1, 0.5, 2), labels=Genders)
 
+# Set up data that can be split for model
+X = ML_Clean.drop(Modalities, axis=1)
+y = ML_Clean[Modalities]
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Storing Looped Results
 LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
@@ -79,7 +78,7 @@ LR_Metrics = pd.DataFrame(columns=metrics, index=range(0, len(Modalities)*len(Ag
 rowID = 0
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Training a Model
+# Training Models
 
 for modality_index in range(0, len(Modalities)):
     for age_index in range(0, len(Ages)):
