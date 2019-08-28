@@ -22,19 +22,65 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 
-
 from imblearn.over_sampling import SMOTE
 from collections import Counter
-from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import accuracy_score, confusion_matrix, auc, roc_auc_score, roc_curve,  classification_report
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Global Variables
+
+# Set output directory
+os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Random_Forest')
+
+# Import data
+ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
+
+# Set up total environment for model
+X = ML_Clean.drop(Modalities, axis=1)
+y = ML_Clean[Modalities]
+
 # set seed
 Random_State = 42
 
+# smote set up
+sm = SMOTE(random_state=Random_State)
+
 # ----------------------------------------------------------------------------------------------------------------------
-# PREP DATA FOR LOOPING  (yes thats a pun)
+# Random Forest Variables
+# set params
+grid_params_rf = [{'bootstrap': [True],
+                   'criterion': ['entropy'],
+                   'max_depth': [100, 50],
+                   'max_features': ['sqrt'],
+                   'min_samples_leaf': [5, 15, 50],
+                   'min_samples_split': [5, 15],
+                   'n_estimators': [100, 500]}]
+grid_cv_rf = 10
+jobs_rf = 20
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Data Segmenting Variables
+
+# Splits available
+Modalities = ['Any', 'X-Ray', 'US', 'MRI', 'CT']
+Ages = ['Any', 'Less1yr', '1-5yr', '6-10yr', 'Over10yr']
+Genders = ['Any', 'F', 'M']
+
+# grouping for age/gender specific data
+Age_Grouping = pd.cut(ML_Clean['Age at Visit in days'],bins=(-10000, -1000, 365, 5*365, 10*365, 100*365), labels=Ages)
+Gender_Grouping = pd.cut(ML_Clean['Gender_M'], bins=(-20, -1, 0.5, 2), labels=Genders)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Storing Looped Results
+metrics = ['Modality', 'Age', 'Gender', 'DataSize', 'ROC_AUC', 'Accuracy', 'Confusion Matrix','Best Params']
+RF_Metrics = pd.DataFrame(columns=metrics, index=range(0, len(Modalities)*len(Ages)*len(Genders)))
+
+rowID = 0
+
+# ----------------------------------------------------------------------------------------------------------------------
+# PREP DATA FOR LOOPING  (yes that is a pun)
 # Import data
 ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
 
@@ -57,8 +103,8 @@ y = ML_Clean[Modalities]
 sm=SMOTE(random_state=Random_State)
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Basic Random Forest
-# Set initial directory
+# Random Forest
+# Set output directory
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Random_Forest')
 
 # set params

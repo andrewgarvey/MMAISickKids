@@ -26,58 +26,60 @@ import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 from collections import Counter
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import accuracy_score, confusion_matrix, auc, roc_auc_score, roc_curve,  classification_report
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Global Variables
+
+# Set output directory
+os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logistic_Regression')
+
+# Import data
+ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
+
+# Set up total environment for model
+X = ML_Clean.drop(Modalities, axis=1)
+y = ML_Clean[Modalities]
 
 # set seed
 Random_State = 42
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Prep data splits
-# Import data
-ML_Clean = pd.read_csv('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv')
-
-# Split data for modeling
-Modalities = ['Any', 'X-Ray', 'US', 'MRI', 'CT']
-Ages = ['Any', 'Less1yr', '1-5yr', '6-10yr', 'Over10yr']
-Genders = ['Any', 'F', 'M']
-
-# grouping for age specific data, 1 year / 5 year / 10 year/ rest
-Age_Grouping = pd.cut(ML_Clean['Age at Visit in days'],bins=(-10000,-1000, 365, 5*365, 10*365, 100*365), labels=Ages)
-
-# grouping for gender specific data
-Gender_Grouping = pd.cut(ML_Clean['Gender_M'], bins=(-20,-1, 0.5, 2), labels=Genders)
-
-# Set up total environment for models
-X = ML_Clean.drop(Modalities, axis=1)
-y = ML_Clean[Modalities]
-
 # smote set up
-sm=SMOTE(random_state=Random_State)
+sm = SMOTE(random_state=Random_State)
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Logistic Regression
-# Set initial directory
-os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Logistic_Regression')
-
-# Set all the variables
-
+# Logistic Regression Variables
 grid_params_lr = {'C': [0.1, 0.01, 0.001, 0.0001],
                   'solver': ['liblinear', "saga"],
                   'multi_class': ['ovr','auto'],
                   'max_iter':  [3000]}
-
 grid_cv_lr = 10
 jobs_lr = 20
 
-# Something to store results
+# ----------------------------------------------------------------------------------------------------------------------
+# Data Segmenting Variables
+
+# Splits available
+Modalities = ['Any', 'X-Ray', 'US', 'MRI', 'CT']
+Ages = ['Any', 'Less1yr', '1-5yr', '6-10yr', 'Over10yr']
+Genders = ['Any', 'F', 'M']
+
+# grouping for age/gender specific data
+Age_Grouping = pd.cut(ML_Clean['Age at Visit in days'],bins=(-10000, -1000, 365, 5*365, 10*365, 100*365), labels=Ages)
+Gender_Grouping = pd.cut(ML_Clean['Gender_M'], bins=(-20, -1, 0.5, 2), labels=Genders)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Storing Looped Results
 LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
 
 metrics = ['Modality', 'Age', 'Gender', 'DataSize', 'ROC_AUC', 'Accuracy', 'Confusion Matrix','Best Params']
 LR_Metrics = pd.DataFrame(columns=metrics, index=range(0, len(Modalities)*len(Ages)*len(Genders)))
 
 rowID = 0
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Training a Model
 
 for modality_index in range(0, len(Modalities)):
     for age_index in range(0, len(Ages)):
