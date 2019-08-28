@@ -58,16 +58,16 @@ plt.show()
 
 # Split data for modeling
 Modalities = ['Any', 'X-Ray', 'US', 'MRI', 'CT']
-Ages = ['<1yr', '1-5yr', '6-10yr', '>10yr']
-Genders = ['F', 'M']
+Ages = ['Any', '<1yr', '1-5yr', '6-10yr', '>10yr']
+Genders = ['Any', 'F', 'M']
 
 # grouping for age specific data, 1 year / 5 year / 10 year/ rest
-Age_Grouping = pd.cut(ML_Clean['Age at Visit in days'],bins=(-100, 365, 5*365, 10*365, 100*365), labels=Ages)
+Age_Grouping = pd.cut(ML_Clean['Age at Visit in days'],bins=(-10000,-1000, 365, 5*365, 10*365, 100*365), labels=Ages)
 
 # grouping for gender specific data
-Gender_Grouping = pd.cut(ML_Clean['Gender_M'], bins=(-1, 0.5, 2), labels=Genders)
+Gender_Grouping = pd.cut(ML_Clean['Gender_M'], bins=(-20,-1, 0.5, 2), labels=Genders)
 
-# Set up total environment for tests
+# Set up total environment for models
 X = ML_Clean.drop(Modalities, axis=1)
 y = ML_Clean[Modalities]
 
@@ -92,7 +92,7 @@ grid_params_lr = {'C': [0.1, 0.01, 0.001, 0.0001],
                   'multi_class': ['ovr','auto'],
                   'max_iter':  [3000]}
 
-grid_cv_lr = 2
+grid_cv_lr = 10
 jobs_lr = 20
 
 # Something to store results
@@ -108,24 +108,29 @@ for modality_index in range(0, len(Modalities)):
     for age_index in range(0, len(Ages)):
         for gender_index in range(0, len(Genders)):
 
-            modality_index = 0
-            age_index = 0
-            gender_index = 0
             # get the Modalities/Age/Gender name for this loop
             modality = Modalities[modality_index]
             age = Ages[age_index]
             gender = Genders[gender_index]
 
             # use index to filter to specific X and y
-            age_gender_index = (Age_Grouping == age) & (Gender_Grouping == gender)
+            if (age == 'Any') & (gender == 'Any'):
+                age_gender_index = Age_Grouping != 'bad age'  # all true
+            elif age == 'Any':
+                age_gender_index = (Gender_Grouping == gender)
+            elif gender == 'Any':
+                age_gender_index = (Age_Grouping == age)
+            else:
+                age_gender_index = (Age_Grouping == age) & (Gender_Grouping == gender)
 
             X_selected = X.loc[age_gender_index, :]
             y_selected = y.loc[age_gender_index, :]
 
             # Split train/test
-            X_train, X_test, y_train, y_test = train_test_split(X_selected, y_selected, test_size=0.25, random_state=Random_State)
+            X_train, X_test, y_train, y_test = train_test_split(X_selected, y_selected, test_size=0.25,
+                                                                random_state=Random_State)
 
-            print("\n \n \n ***********" + str(modality)+" "+str(age)+" "+str(gender) + " ***********")
+            print("\n \n *********** Mod:" + str(modality)+", Age:"+str(age)+", Gender:"+str(gender) + " ***********")
 
             # set the y train with the target variable
             y_train_modality = y_train.iloc[:, y_train.columns == modality].values.reshape(-1, )
@@ -177,16 +182,16 @@ for modality_index in range(0, len(Modalities)):
             plt.ylim([0.0, 1.05])
             plt.xlabel('False Positive Rate')
             plt.ylabel('True Positive Rate')
-            plt.title("Logistic Regression " + str(modality)+" "+str(age)+" "+str(gender) + " ROC Curve")
+            plt.title("Logistic Regression- Mod:" + str(modality)+", Age:"+str(age)+", Gender:"+str(gender))
             plt.legend(loc="lower right")
             plt.show()
+            plt.savefig("Logistic Regression- Mod:" + str(modality)+", Age:"+str(age)+", Gender:" +str(gender) + ".pdf")
 
             # ----------------------------------------------------------------------------------------------------------
             # Store Weights
             LR_weights[str(modality) + " " + str(age) + " " + str(gender)] = pd.Series(grid.best_estimator_.coef_[0, :])
 
             # Store Metrics
-
             LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Modality'] = modality
             LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Age'] = age
             LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Gender'] = gender
@@ -195,11 +200,11 @@ for modality_index in range(0, len(Modalities)):
             LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Accuracy'] = accuracy_score(y_test_modality, pred_binary)
             LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Confusion Matrix'] = str(confusion_matrix(y_test_modality,
                                                                                                     pred_binary))
-
             # Increment Row for next loop
             rowID = rowID+1
 
 LR_Metrics_Backup = LR_Metrics
+LR_weights_Backup = LR_weights
 
 # ----------------------------------------------------------------------------------------------------------------------
 """
