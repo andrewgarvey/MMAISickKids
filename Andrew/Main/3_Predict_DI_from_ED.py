@@ -53,12 +53,9 @@ sns.heatmap(corr)
 plt.show()
 """
 
-#-------------------------------------------------------------------------------------------------------------
-#General pre modeling
-
 # Split data for modeling
 Modalities = ['Any', 'X-Ray', 'US', 'MRI', 'CT']
-Ages = ['Any', '<1yr', '1-5yr', '6-10yr', '>10yr']
+Ages = ['Any', 'Less1yr', '1-5yr', '6-10yr', 'Over10yr']
 Genders = ['Any', 'F', 'M']
 
 # grouping for age specific data, 1 year / 5 year / 10 year/ rest
@@ -98,15 +95,18 @@ jobs_lr = 20
 # Something to store results
 LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
 
-metrics = ['Modality', 'Age', 'Gender', 'DataSize', 'ROC_AUC', 'Accuracy', 'Confusion Matrix']
+metrics = ['Modality', 'Age', 'Gender', 'DataSize', 'ROC_AUC', 'Accuracy', 'Confusion Matrix','Best Params']
 LR_Metrics = pd.DataFrame(columns=metrics, index=range(0, len(Modalities)*len(Ages)*len(Genders)))
-
 
 rowID = 0
 
 for modality_index in range(0, len(Modalities)):
     for age_index in range(0, len(Ages)):
         for gender_index in range(0, len(Genders)):
+
+            modality_index = 0
+            gender_index = 1
+            age_index = 3
 
             # get the Modalities/Age/Gender name for this loop
             modality = Modalities[modality_index]
@@ -184,7 +184,6 @@ for modality_index in range(0, len(Modalities)):
             plt.ylabel('True Positive Rate')
             plt.title("Logistic Regression- Mod:" + str(modality)+", Age:"+str(age)+", Gender:"+str(gender))
             plt.legend(loc="lower right")
-            plt.show()
             plt.savefig("Logistic Regression- Mod:" + str(modality)+", Age:"+str(age)+", Gender:" +str(gender) + ".pdf")
 
             # ----------------------------------------------------------------------------------------------------------
@@ -192,25 +191,29 @@ for modality_index in range(0, len(Modalities)):
             LR_weights[str(modality) + " " + str(age) + " " + str(gender)] = pd.Series(grid.best_estimator_.coef_[0, :])
 
             # Store Metrics
-            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Modality'] = modality
-            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Age'] = age
-            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Gender'] = gender
-            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'DataSize'] = len(y_selected)
-            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'ROC_AUC'] = roc_auc_score(y_test_modality, pred_proba)
-            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Accuracy'] = accuracy_score(y_test_modality, pred_binary)
-            LR_Metrics.iloc[rowID, LR_Metrics.columns == 'Confusion Matrix'] = str(confusion_matrix(y_test_modality,
-                                                                                                    pred_binary))
+            metric_answers = [modality,
+                              age,
+                              gender,
+                              len(y_selected),
+                              roc_auc_score(y_test_modality, pred_proba),
+                              accuracy_score(y_test_modality, pred_binary),
+                              str(confusion_matrix(y_test_modality, pred_binary)),
+                              str(grid.best_params_)
+                              ]
+
+            for metric_index in range(0, len(metric_answers)):
+                LR_Metrics.iloc[rowID, LR_Metrics.columns == metrics[metric_index]] = metric_answers[metric_index]
+
             # Increment Row for next loop
             rowID = rowID+1
 
-LR_Metrics_Backup = LR_Metrics
-LR_weights_Backup = LR_weights
+# Store end results as csv
+LR_Metrics.to_csv('LR_Metrics.csv')
+LR_weights.to_csv('LR_weights.csv')
 
 # ----------------------------------------------------------------------------------------------------------------------
-"""
 # Basic Random Forest
 # Set initial directory
-
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Model/Random_Forest')
 
 # set params
@@ -220,71 +223,124 @@ grid_params_rf = [{'bootstrap': [True],
                    'max_features': ['sqrt'],
                    'min_samples_leaf': [5, 15, 50],
                    'min_samples_split': [5],
-                   'n_estimators': [100]
+                   'n_estimators': [100,500]
                    }]
 grid_cv_rf = 10
 jobs_rf = 20
 
+# Something to store results
+LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
 
+metrics = ['Modality', 'Age', 'Gender', 'DataSize', 'ROC_AUC', 'Accuracy', 'Confusion Matrix','Best Params']
+LR_Metrics = pd.DataFrame(columns=metrics, index=range(0, len(Modalities)*len(Ages)*len(Genders)))
 
-for index in range(0, len(Modalities)):
+rowID = 0
 
-    # get the Modalities name for this loop
-    Modality = Modalities[index]
+for modality_index in range(0, len(Modalities)):
+    for age_index in range(0, len(Ages)):
+        for gender_index in range(0, len(Genders)):
 
-    print("\n \n \n *********** Modality: " + Modality + " ***********")
+            # get the Modalities/Age/Gender name for this loop
+            modality = Modalities[modality_index]
+            age = Ages[age_index]
+            gender = Genders[gender_index]
 
-    # set the y train with the target variable
-    y_train_modality = y_train.iloc[:, y_train.columns == Modality].values.reshape(-1, )
+            # use index to filter to specific X and y
+            if (age == 'Any') & (gender == 'Any'):
+                age_gender_index = Age_Grouping != 'bad age'  # all true
+            elif age == 'Any':
+                age_gender_index = (Gender_Grouping == gender)
+            elif gender == 'Any':
+                age_gender_index = (Age_Grouping == age)
+            else:
+                age_gender_index = (Age_Grouping == age) & (Gender_Grouping == gender)
 
-    # original balance
-    print('Pre-Smote: '+ str(Counter(y_train_modality)))
+            X_selected = X.loc[age_gender_index, :]
+            y_selected = y.loc[age_gender_index, :]
 
-    #smote and new balance
-    X_train_smote, y_train_modality_smote = sm.fit_resample(X_train, y_train_modality)
-    print('Post-Smote: '+ str(Counter(y_train_modality_smote)))
+            # Split train/test
+            X_train, X_test, y_train, y_test = train_test_split(X_selected, y_selected, test_size=0.25,
+                                                                random_state=Random_State)
 
-    # Set the model conditions, run the model
-    grid = GridSearchCV(estimator=RandomForestClassifier(random_state=Random_State), param_grid=grid_params_rf,
-                        scoring='recall', cv=grid_cv_rf, n_jobs=jobs_rf, verbose=1)
+            print("\n \n *********** Mod:" + str(modality)+", Age:"+str(age)+", Gender:"+str(gender) + " ***********")
 
-    #grid.fit(X_train, np.ravel(y_train_modality))
-    grid.fit(X_train_smote, np.ravel(y_train_modality_smote))
+            # set the y train with the target variable
+            y_train_modality = y_train.iloc[:, y_train.columns == modality].values.reshape(-1, )
 
-    # Evaluate training results
-    print("*********** Training Results ***********")
-    print("Best Roc Auc Score: " + str(grid.best_score_))
-    print("Best Parameters: " + str(grid.best_params_))
+            # original balance
+            print('Pre-Smote: '+ str(Counter(y_train_modality)))
 
-    # Predict on Test Data
-    pred_binary = grid.predict(X_test)
-    pred = grid.predict_proba(X_test)
-    pred_proba = pred[:, 1]
-    y_test_modality = y_test.iloc[:, y_test.columns == Modality].values.reshape(-1, )
+            # smote and new balance
+            X_train_smote, y_train_modality_smote = sm.fit_resample(X_train, y_train_modality)
+            print('Post-Smote: ' + str(Counter(y_train_modality_smote)))
 
-    # Evaluate Testing Results
-    # binary
-    print("*********** Binary Test Results ***********")
-    print("Confusion Matrix: \n" + str(confusion_matrix(y_test_modality, pred_binary)))
-    print("Classification Report:  \n" + str(classification_report(y_test_modality, pred_binary)))
-    print("Accuracy: " + str(accuracy_score(y_test_modality, pred_binary)))
+            # Set the model conditions, run the model
+            grid = GridSearchCV(estimator=RandomForestClassifier(random_state=Random_State), param_grid=grid_params_rf,
+                                scoring='roc_auc', cv=grid_cv_rf, n_jobs=jobs_rf, verbose=1)
 
-    # probabilistic
-    print("*********** Probabilistic Test Results ***********")
-    print("ROC AUC Score: \n" + str(roc_auc_score(y_test_modality, pred_proba)))
+            grid.fit(X_train_smote, np.ravel(y_train_modality_smote))
 
-    # Auc Graph
-    fpr, tpr, thresholds = roc_curve(y_test_modality, pred_proba)
-    roc_auc = auc(fpr, tpr)
+            # Evaluate training results
+            print("*********** Training Results ***********")
+            print("Best Roc Auc Score: " + str(grid.best_score_))
+            print("Best Parameters: " + str(grid.best_params_))
 
-    plt.figure()
-    plt.plot(fpr, tpr, color='darkorange',  label='ROC curve (area = %0.2f)' % roc_auc)  # roc
-    plt.plot([0, 1], [0, 1], color='navy',  linestyle='--')  # baseline
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title("Random Forest " +str(Modality) + " ROC Curve")
-    plt.legend(loc="lower right")
-    plt.show()
-"""
+            # ----------------------------------------------------------------------------------------------------------
+            # Predict on Test Data
+            pred_binary = grid.predict(X_test)
+            pred = grid.predict_proba(X_test)
+            pred_proba = pred[:, 1]
+            y_test_modality = y_test.iloc[:, y_test.columns == modality].values.reshape(-1, )
+
+            # Evaluate Testing Results
+            # binary
+            print("*********** Binary Test Results ***********")
+            print("Confusion Matrix: \n" + str(confusion_matrix(y_test_modality, pred_binary)))
+            print("Classification Report:  \n" + str(classification_report(y_test_modality, pred_binary)))
+            print("Accuracy: " + str(accuracy_score(y_test_modality, pred_binary)))
+
+            # probabilistic
+            print("*********** Probabilistic Test Results ***********")
+            print("ROC AUC Score: \n" + str(roc_auc_score(y_test_modality, pred_proba)))
+
+            # Auc Graph
+            fpr, tpr, thresholds = roc_curve(y_test_modality, pred_proba)
+            roc_auc = auc(fpr, tpr)
+
+            plt.figure()
+            plt.plot(fpr, tpr, color='darkorange',  label='ROC curve (area = %0.2f)' % roc_auc)  # roc
+            plt.plot([0, 1], [0, 1], color='navy',  linestyle='--')  # baseline
+            plt.xlim([0.0, 1.0])
+            plt.ylim([0.0, 1.05])
+            plt.xlabel('False Positive Rate')
+            plt.ylabel('True Positive Rate')
+            plt.title("Logistic Regression- Mod:" + str(modality)+", Age:"+str(age)+", Gender:"+str(gender))
+            plt.legend(loc="lower right")
+            plt.show()
+            plt.savefig("Logistic Regression- Mod:" + str(modality)+", Age:"+str(age)+", Gender:" +str(gender) + ".pdf")
+
+            # ----------------------------------------------------------------------------------------------------------
+            # Store Weights
+            LR_weights[str(modality) + " " + str(age) + " " + str(gender)] = pd.Series(grid.best_estimator_.coef_[0, :])
+
+            # Store Metrics
+            metric_answers = [modality,
+                              age,
+                              gender,
+                              len(y_selected),
+                              roc_auc_score(y_test_modality, pred_proba),
+                              accuracy_score(y_test_modality, pred_binary),
+                              str(confusion_matrix(y_test_modality, pred_binary)),
+                              str(grid.best_params_)
+                              ]
+
+            for metric_index in range(0, len(metric_answers)):
+                RF_Metrics.iloc[rowID, RF_Metrics.columns == metrics[metric_index]] = metric_answers[metric_index]
+
+            # Increment Row for next loop
+            rowID = rowID+1
+
+# Store end results as csv
+RF_Metrics.to_csv('RF_Metrics.csv')
+RF_weights.to_csv('RF_weights.csv')
+
