@@ -104,10 +104,6 @@ for modality_index in range(0, len(Modalities)):
     for age_index in range(0, len(Ages)):
         for gender_index in range(0, len(Genders)):
 
-            modality_index = 0
-            gender_index = 1
-            age_index = 3
-
             # get the Modalities/Age/Gender name for this loop
             modality = Modalities[modality_index]
             age = Ages[age_index]
@@ -222,23 +218,23 @@ grid_params_rf = [{'bootstrap': [True],
                    'max_depth': [100, 50],
                    'max_features': ['sqrt'],
                    'min_samples_leaf': [5, 15, 50],
-                   'min_samples_split': [5],
-                   'n_estimators': [100,500]
+                   'min_samples_split': [5, 15],
+                   'n_estimators': [100, 500]
                    }]
 grid_cv_rf = 10
 jobs_rf = 20
 
 # Something to store results
-LR_weights = pd.DataFrame(pd.Series(X.columns), columns=['Columns'])
-
-metrics = ['Modality', 'Age', 'Gender', 'DataSize', 'ROC_AUC', 'Accuracy', 'Confusion Matrix','Best Params']
-LR_Metrics = pd.DataFrame(columns=metrics, index=range(0, len(Modalities)*len(Ages)*len(Genders)))
+metrics = ['Modality', 'Age', 'Gender', 'DataSize', 'ROC_AUC', 'Accuracy', 'Confusion Matrix', 'Best Params']
+RF_Metrics = pd.DataFrame(columns=metrics, index=range(0, len(Modalities)*len(Ages)*len(Genders)))
 
 rowID = 0
+
 
 for modality_index in range(0, len(Modalities)):
     for age_index in range(0, len(Ages)):
         for gender_index in range(0, len(Genders)):
+
 
             # get the Modalities/Age/Gender name for this loop
             modality = Modalities[modality_index]
@@ -314,15 +310,11 @@ for modality_index in range(0, len(Modalities)):
             plt.ylim([0.0, 1.05])
             plt.xlabel('False Positive Rate')
             plt.ylabel('True Positive Rate')
-            plt.title("Logistic Regression- Mod:" + str(modality)+", Age:"+str(age)+", Gender:"+str(gender))
+            plt.title("Random Forest- Mod:" + str(modality)+", Age:"+str(age)+", Gender:"+str(gender))
             plt.legend(loc="lower right")
-            plt.show()
-            plt.savefig("Logistic Regression- Mod:" + str(modality)+", Age:"+str(age)+", Gender:" +str(gender) + ".pdf")
+            plt.savefig("Random Forest- Mod:" + str(modality)+", Age:"+str(age)+", Gender:" +str(gender) + ".pdf")
 
             # ----------------------------------------------------------------------------------------------------------
-            # Store Weights
-            LR_weights[str(modality) + " " + str(age) + " " + str(gender)] = pd.Series(grid.best_estimator_.coef_[0, :])
-
             # Store Metrics
             metric_answers = [modality,
                               age,
@@ -342,5 +334,5 @@ for modality_index in range(0, len(Modalities)):
 
 # Store end results as csv
 RF_Metrics.to_csv('RF_Metrics.csv')
-RF_weights.to_csv('RF_weights.csv')
+
 
