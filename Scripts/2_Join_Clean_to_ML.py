@@ -54,6 +54,10 @@ All_Clean = pysqldf("SELECT * FROM ED_Clean AS e "
 
 All_Clean.isna().sum()
 
+# sharing csv, one time
+#All_Clean_shared = All_Clean.dropna(axis=1)
+#All_Clean_shared.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ED_plus_DI_by_ORDER.csv', index = None, header=True)
+
 # Drop rows that we cannot possibly have AT THE TIME this Model aims to be used (nearly all of DI, some of ED)
 All_Clean_Reduced = All_Clean.drop(['ED Completed Length of Stay (Minutes)', 'Roomed', 'Disch Date/Time', 'Dispo',
                                     'Roomed to Discharge', 'Roomed to Discharge', 'Arrived to Discharge',
@@ -135,6 +139,8 @@ All_Clean_Condensed['MRI'] = (All_Clean_Condensed['Category id'].str.contains('7
 All_Clean_Condensed['CT'] = (All_Clean_Condensed['Category id'].str.contains('2.0'))
 All_Clean_Condensed['Any'] = (All_Clean_Condensed['Category id'].str.contains(r'\d')) #any test of any kind
 
+# for sharing, one time
+# All_Clean_Condensed.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ED_plus_Category_by_VISIT.csv', index = None, header=True)
 
 # Remove columns if no longer needed for whatever reason
 All_Clean_Dropped = All_Clean_Condensed.drop(['CSN', 'Arrival Method', 'CC', 'Postal Code',
