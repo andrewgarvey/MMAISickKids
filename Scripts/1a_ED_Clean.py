@@ -23,12 +23,6 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 
-# Import Custom Functions
-from Data_Functions import test_func
-
-# Import Custom Files
-import Data_Functions
-
 # Import ED Data
 
 ED_2018_Aug_2019_Feb = pd.read_csv('/home/dsingh/Public/ED_Epic_Data/ED_DATA_EPIC_AUG18_TO_FEB19.csv'
