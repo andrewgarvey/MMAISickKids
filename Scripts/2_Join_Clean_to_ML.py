@@ -156,14 +156,16 @@ All_Clean_Dropped = All_Clean_Dropped.dropna()
 All_Clean_Dropped.isna().sum()
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Take structurally suitable data,  confirm its usefulness, drop columns if appropriate
-"""
-# scaling (omitted to retain readability, actual implemented model should consider it)
-scale = StandardScaler()
+# Remove some which have high dependencies/correlations, mostly caused by dummy variables
+# corr matrix
+corr = All_Clean_Dropped.corr()
+sns.heatmap(corr)
+plt.savefig("Corr Matrix.pdf")
 
-X_train = scale.fit_transform(X_train)
-X_test = scale.fit_transform(X_test)
-"""
+# Remove them
+All_Clean_Dropped = All_Clean_Dropped[All_Clean_Dropped.columns.drop(list(All_Clean_Dropped.filter(regex='Province|Arrived_|Method|Day_of_Arrival')))]
+All_Clean_Dropped = All_Clean_Dropped.drop(['Gender_U', 'Encounter Number', 'Visits Since Aug 2018','Gender_F' ], axis=1)
+
 # Information Gain style statistics
 Modalities = ['Any', 'X-Ray', 'US', 'MRI', 'CT']
 
@@ -183,22 +185,10 @@ Info_Gain.to_csv('Info_Gain_Matrix.csv')
 
 # Determine a threshold and drop ones that don't meet it
 Info_Gain['max'] = Info_Gain.max(axis=1)
-keep_index = np.array(Info_Gain['max'] > 0.0005)  # helpful somewhere, many are straight 0s
+keep_index = np.array((Info_Gain['max'] > 0.0005) | (Info_Gain['max'].isna())) # helpful somewhere, many are straight 0s
 
-All_Clean_final = All_Clean_Dropped.loc[:, keep_index]
-
+All_Clean_final = All_Clean_Dropped.iloc[keep_index]
 # ----------------------------------------------------------------------------------------------------------------------
-# Remove some which have high dependencies/correlations, mostly caused by dummy variables
-
-# corr matrix
-corr = All_Clean_Dropped.corr()
-sns.heatmap(corr)
-plt.savefig("Corr Matrix.pdf")
-
-# Remove them
-All_Clean_final = All_Clean_final[All_Clean_final.columns.drop(list(All_Clean_final.filter(regex='Province|Arrived_|Method|Day_of_Arrival')))]
-All_Clean_final = All_Clean_final.drop(['Gender_U', 'Encounter Number', 'Visits Since Aug 2018','Gender_F' ], axis=1)
-
 
 # Write it to csv for easy reference
 All_Clean_final.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ML_Clean.csv', index = None, header=True)
