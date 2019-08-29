@@ -187,7 +187,7 @@ Info_Gain.to_csv('Info_Gain_Matrix.csv')
 Info_Gain['max'] = Info_Gain.max(axis=1)
 keep_index = np.array((Info_Gain['max'] > 0.0005) | (Info_Gain['max'].isna())) # helpful somewhere, many are straight 0s
 
-All_Clean_final = All_Clean_Dropped.iloc[keep_index]
+All_Clean_final = All_Clean_Dropped.iloc[:,keep_index]
 # ----------------------------------------------------------------------------------------------------------------------
 
 # Write it to csv for easy reference
