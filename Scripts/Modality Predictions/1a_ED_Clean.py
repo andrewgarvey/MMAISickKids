@@ -8,9 +8,8 @@ Title: ED_Review_Main
 
 Purpose:
 -   Look for any trends in ED data that might be useful as it relates to staffing on a long term basis
--   Prepare visualizations for a 1 time presentation
 """
-# clear user created variables
+# Clear variables
 for name in dir():
     if not name.startswith('_'):
         del globals()[name]
@@ -54,6 +53,7 @@ ED_2018_Aug_2019_Feb.columns = ED_2019_Feb.columns
 ED_Full = ED_2018_Aug_2019_Feb.append([ED_2019_Feb,ED_2019_Mar,ED_2019_Apr,ED_2019_May,ED_2019_Jun],ignore_index=True)
 
 ED_Full.shape
+ED_Full.dtypes
 
 # check for dupes, incase the timeframe overlapped, check for duplicated MRN
 sum(ED_Full.duplicated(subset=None, keep='first')) # 0, no dupes across whole row
@@ -74,6 +74,7 @@ ED_Full = ED_Full.loc[~ED_dup_index]
 # Columns
 ED_Full.columns
 ED_Full.isna().sum()
+ED_Full.dtypes
 
 # Remove entirely useless columns, recall purpose is to 'predict demand as function of month/day' and 'predict DI'
 ED_Reduced = ED_Full.drop(['Registration Number','Pref Language','Acuity','Care Area',
@@ -225,11 +226,11 @@ ED_Clean_w_null.describe().transpose()
 ED_Clean = ED_Clean_w_null.dropna()
 
 ED_Clean_w_null.shape
-ED_Clean.shape # I consider this acceptable loses for a proof of concept model making
+ED_Clean.shape  # I consider this acceptable loses for a proof of concept model making
 # if certain columns seem super good predictors, find a way to insert when making the pipeline.
 
 # Check out formats and what not for proper data types, want integers/factors
-ED_Clean.dtypes # looks fine
+ED_Clean.dtypes  # looks fine
 
 # write that to csv for usage later
 ED_Clean.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ED_Clean.csv', index = None, header=True)

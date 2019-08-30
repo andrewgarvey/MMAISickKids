@@ -10,7 +10,7 @@ Purpose:
 """
 # clear user created variables
 for name in dir():
-    if not name.startswith('_'):
+    if not name.startswith('_'):-
         del globals()[name]
 
 del name

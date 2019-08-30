@@ -48,7 +48,7 @@ sm = SMOTE(random_state=Random_State)
 grid_params_rf = [{'bootstrap': [True],
                    'criterion': ['entropy'],
                    'max_depth': [100, 50],
-                   'max_features': ['sqrt'],
+                   'max_features': ['sqrt', 'log2'],
                    'min_samples_leaf': [5, 15, 50],
                    'min_samples_split': [5, 15],
                    'n_estimators': [100, 500]}]

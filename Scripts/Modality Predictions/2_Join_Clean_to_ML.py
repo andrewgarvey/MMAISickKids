@@ -54,10 +54,6 @@ All_Clean = pysqldf("SELECT * FROM ED_Clean AS e "
 
 All_Clean.isna().sum()
 
-# sharing csv, one time
-#All_Clean_shared = All_Clean.dropna(axis=1)
-#All_Clean_shared.to_csv(r'/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/ED_plus_DI_by_ORDER.csv', index = None, header=True)
-
 # Drop rows that we cannot possibly have AT THE TIME this Model aims to be used (nearly all of DI, some of ED)
 All_Clean_Reduced = All_Clean.drop(['ED Completed Length of Stay (Minutes)', 'Roomed', 'Disch Date/Time', 'Dispo',
                                     'Roomed to Discharge', 'Roomed to Discharge', 'Arrived to Discharge',
@@ -164,8 +160,9 @@ All_Clean_Dropped.isna().sum()
 # ----------------------------------------------------------------------------------------------------------------------
 # Remove some which have high dependencies/correlations, mostly caused by dummy variables
 # corr matrix
-corr = All_Clean_Dropped.corr()
+corr = All_Clean_Dropped.iloc[:,[0,1,2,3,4,5,6,7,8,9,10]].corr()
 sns.heatmap(corr)
+plt.show()
 plt.savefig("Corr Matrix.pdf")
 
 # Remove them
