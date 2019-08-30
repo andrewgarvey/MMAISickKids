@@ -3,20 +3,17 @@
 Author: Andrew Garvey     
 Partner: Sargon Morad
 
-### Desired outcomes of this project
+Date: Apr-Aug 2019 
 
-#### DI Review
--   Look for any trends in DI data that might be useful as it relates to staffing on a long term basis
--   Prepare visualizations for a 1 time presentation 
-#### ED Review
--   Look for any trends in ED data that might be useful as it relates to staffing on a long term basis
--   Prepare visualizations for a 1 time presentation 
+DI = Diagnostic Imaging
+ED = Emergency Department
 
-#### ED to DI Predictions
--   Develop a model to predict DI demand using ED triage data and any outside available factors
+#### Data Cleaning
+-   Clean data from both ED and DI to be appropriate for ML tasks
 
-#### Visualizations
--   Visualization to display information to DI
--   Visualization to display information to ED
--   Something that would be kept real time with a focus on usability
+#### Predicting the assigning of DI tests based on ED Triage Data  
+-   Develop a Logistic Regression and Random Forest model to predict DI demand using ED triage data and any outside available factors
+-   Done by Modality and by Demographic Segmentation
 
+#### Order Time and Visualizations
+-   Produce insightful visualizations related to DI Order Time over large timeframes
