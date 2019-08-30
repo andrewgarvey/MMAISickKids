@@ -4,19 +4,16 @@ Partner: Andrew Garvey, edited slightly
 Date: July 1st, 2019
 Client: Hospital for Sick Children
 
-Title: DI_Review_Main
-
 Purpose:
-- Clean the DI data for future analysis
+- Clean the DI Data
 """
 
-# clear user created variables
+# clear variables
 for name in dir():
     if not name.startswith('_'):
         del globals()[name]
 
 del name
-## Edited to remove ED things and change
 
 import numpy as np
 import scipy as sp
@@ -28,7 +25,6 @@ import os
 os.chdir('/home/andrew/PycharmProjects/SickKidsMMAI/Generated_Outputs/Data/')
 
 #import ED DI Data
-
 di2018q3 = pd.read_excel('/home/andrew/Public/DI/ED DI 2018 - Q3.xlsx')  # only 1 sheet
 di2018q4 = pd.read_excel('/home/andrew/Public/DI/ED DI 2018 - Q4.xlsx')
 di2019q1 = pd.read_excel('/home/andrew/Public/DI/ED DI 2019 - Q1.xlsx')
@@ -59,8 +55,6 @@ categories = pd.DataFrame(di_data[['Category']])
 categories['Category id'] = categories.groupby(['Category']).ngroup()
 categories = categories.drop_duplicates()
 categories = categories.sort_values('Category id')
-
-
 
 # create a procedure  df
 procedures = pd.DataFrame(di_data[['Procedure']])

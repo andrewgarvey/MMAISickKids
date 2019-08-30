@@ -4,12 +4,10 @@ Partner: Sargon Morad
 Date: Aug 23, 2019
 Client: Hospital for Sick Children
 
-Title: ED_DI_to_ML
-
 Purpose:
--   Turn cleaned data into usable ml data
+-   Turn cleaned ED and DI data into usable ml data
 """
-# clear user created variables
+# clear variables
 for name in dir():
     if not name.startswith('_'):
         del globals()[name]
@@ -150,8 +148,6 @@ All_Clean_Dropped['Last Weight formatted'] = pd.to_numeric(All_Clean_Dropped['La
 All_Clean_Dropped['Pulse Formatted'] = pd.to_numeric(All_Clean_Dropped['Pulse Formatted'], errors='coerce')
 All_Clean_Dropped['Resp Formatted'] = pd.to_numeric(All_Clean_Dropped['Resp Formatted'], errors='coerce')
 All_Clean_Dropped['Temp Formatted'] = pd.to_numeric(All_Clean_Dropped['Temp Formatted'], errors='coerce')
-
-
 
 # Confirm all the columns are without nulls
 All_Clean_Dropped = All_Clean_Dropped.dropna()

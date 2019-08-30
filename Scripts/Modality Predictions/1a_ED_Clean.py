@@ -4,10 +4,8 @@ Partner: Sargon Morad
 Date: July 1st, 2019
 Client: Hospital for Sick Children
 
-Title: ED_Review_Main
-
 Purpose:
--   Look for any trends in ED data that might be useful as it relates to staffing on a long term basis
+-   Clean the ED Data
 """
 # Clear variables
 for name in dir():
@@ -52,22 +50,19 @@ ED_2018_Aug_2019_Feb.columns = ED_2019_Feb.columns
 # merge everything together
 ED_Full = ED_2018_Aug_2019_Feb.append([ED_2019_Feb,ED_2019_Mar,ED_2019_Apr,ED_2019_May,ED_2019_Jun],ignore_index=True)
 
-ED_Full.shape
-ED_Full.dtypes
-
-# check for dupes, incase the timeframe overlapped, check for duplicated MRN
+# check for dupes, in case the time frame overlapped, check for duplicated MRN
 sum(ED_Full.duplicated(subset=None, keep='first')) # 0, no dupes across whole row
 sum(ED_Full.duplicated(subset='MRN', keep='first')) # 212000 are duplicated Patients
-sum(ED_Full.duplicated(subset='CSN', keep=False)) # 174 duplicated Visits, gonna remove entirely small enough
+sum(ED_Full.duplicated(subset='CSN', keep=False)) # 174 duplicated Visits, gonna remove entirely, small enough
 
 # cleaning
 lst =  ED_2018_Aug_2019_Feb, ED_2019_Apr, ED_2019_Feb, ED_2019_Mar, ED_2019_May, ED_2019_Jun
 del ED_2018_Aug_2019_Feb, ED_2019_Apr, ED_2019_Feb, ED_2019_Mar, ED_2019_May, ED_2019_Jun
 del lst
 # ----------------------------------------------------------------------------------------------------------------------
-# Data Exploration Cleaning
+# Data Exploration and Cleaning
 
-# CSN dups removed
+# CSN duplicates removed
 ED_dup_index = ED_Full.duplicated(subset='CSN', keep=False)
 ED_Full = ED_Full.loc[~ED_dup_index]
 
@@ -84,12 +79,6 @@ ED_Reduced = ED_Full.drop(['Registration Number','Pref Language','Acuity','Care 
                            'Door to Pain Med','Hour of Arrival','Triage Complete User',
                            'Arrival to Initial Nursing Assessment','Door to Doc','CC.1','Primary Dx','Diagnoses',
                            'Admitting Provider','Lab Status','Rad Status','BP'],axis = 1)
-
-
-# Counts
-ED_Reduced.columns
-ED_Reduced.isna().sum()
-ED_Reduced.dtypes
 
 # Encounter Number, pick only multi MRN, sort by mrn,
 multi_mrn_index = ED_Full.duplicated(subset='MRN', keep=False)
@@ -169,7 +158,7 @@ month_index = (ED_Reduced['Age at Visit denomination']=='m.o.')
 week_index = (ED_Reduced['Age at Visit denomination']=='wk.o.')
 days_index = (ED_Reduced['Age at Visit denomination']=='days')
 
-ED_Reduced['Age at Visit denomination'].loc[year_index] = 365 # gives warning , still works fine
+ED_Reduced['Age at Visit denomination'].loc[year_index] = 365  # gives warning , still works fine
 ED_Reduced['Age at Visit denomination'].loc[month_index] = 30
 ED_Reduced['Age at Visit denomination'].loc[week_index] = 7
 ED_Reduced['Age at Visit denomination'].loc[days_index] = 1
@@ -193,7 +182,7 @@ ED_Reduced['Current Medications Number'] = ED_Reduced['Current Medications Numbe
 nan_index = ED_Reduced['Current Medications Number'].isnull()
 ED_Reduced['Current Medications Number'].loc[nan_index] = 0
 
-#pulse and resp and temp, use just number no text, rounded
+# pulse and resp and temp, use just number no text, rounded
 ED_Reduced['Pulse'] = ED_Reduced['Pulse'].astype(str)
 ED_Reduced['Resp'] = ED_Reduced['Resp'].astype(str)
 ED_Reduced['Temp'] = ED_Reduced['Temp'].astype(str)
@@ -215,12 +204,12 @@ ED_Reduced['Temp Formatted'].loc[empty_index_temp] = np.nan
 ED_Clean_w_null = ED_Reduced.drop(['Age at Visit','Last Weight','Current Medications','Pulse','Resp','Temp',
                                    'Age at Visit Number','Age at Visit denomination'] , axis = 1)
 # ----------------------------------------------------------------------------------------------------------------------
-## Basic Stats
+# Basic Stats
 # We can have a overall, but for statistics that are appropriate everything should be grouped by gender and age buckets
 ED_Clean_w_null.describe().transpose()
 
 # ----------------------------------------------------------------------------------------------------------------------
-## Making the last step towards a clean dataset worth looking at for insights
+# Making the last step towards a clean dataset worth looking at for insights
 
 # Remove or replace all Nulls
 ED_Clean = ED_Clean_w_null.dropna()

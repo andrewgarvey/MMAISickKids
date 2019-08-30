@@ -8,7 +8,7 @@ Purpose:
 -   Logistic Regression Model for each modality
 -   Attempt version of different age/gender groupings
 """
-# clear user created variables
+# clear variables
 for name in dir():
     if not name.startswith('_'):-
         del globals()[name]
