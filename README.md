@@ -5,8 +5,7 @@ Partner: Sargon Morad
 
 Date: Apr-Aug 2019 
 
-DI = Diagnostic Imaging
-
+DI = Diagnostic Imaging, 
 ED = Emergency Department
 
 #### Data Cleaning
