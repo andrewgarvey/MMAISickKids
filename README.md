@@ -9,7 +9,7 @@ Languages: Python, Jupyter Notebook
 
 ---
 
-DI = Diagnostic Imaging,   
+DI = Diagnostic Imaging, 
 ED = Emergency Department
 
 #### Data Cleaning
