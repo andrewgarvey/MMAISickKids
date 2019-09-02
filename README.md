@@ -5,6 +5,8 @@ Partner: Sargon Morad
 
 Date: Apr-Aug 2019 
 
+Languages: Python, Jupyter Notebook
+
 DI = Diagnostic Imaging, 
 ED = Emergency Department
 
